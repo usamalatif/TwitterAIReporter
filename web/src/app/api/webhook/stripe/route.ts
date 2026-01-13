@@ -45,7 +45,9 @@ export async function POST(request: NextRequest) {
         }
 
         // Get subscription details from Stripe
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const subscriptionData = await stripe.subscriptions.retrieve(subscriptionId)
+        // In Stripe API v20+, current_period_end is on each subscription item
+        const periodEnd = subscriptionData.items.data[0]?.current_period_end || Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
 
         // Update user with Stripe customer ID and subscription
         await prisma.user.update({
@@ -63,12 +65,12 @@ export async function POST(request: NextRequest) {
             userId,
             stripeSubscriptionId: subscriptionId,
             status: 'active',
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            currentPeriodEnd: new Date(periodEnd * 1000),
           },
           update: {
             stripeSubscriptionId: subscriptionId,
             status: 'active',
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            currentPeriodEnd: new Date(periodEnd * 1000),
           },
         })
 
@@ -77,9 +79,11 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
-        const subscriptionId = subscription.id
-        const status = subscription.status
+        const subscriptionEvent = event.data.object as Stripe.Subscription
+        const subscriptionId = subscriptionEvent.id
+        const status = subscriptionEvent.status
+        // In Stripe API v20+, current_period_end is on each subscription item
+        const periodEndUpdated = subscriptionEvent.items.data[0]?.current_period_end || Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
 
         console.log('Subscription updated:', subscriptionId, 'Status:', status)
 
@@ -101,7 +105,7 @@ export async function POST(request: NextRequest) {
             where: { stripeSubscriptionId: subscriptionId },
             data: {
               status: dbStatus,
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              currentPeriodEnd: new Date(periodEndUpdated * 1000),
             },
           })
 
@@ -148,7 +152,13 @@ export async function POST(request: NextRequest) {
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice
-        const subscriptionId = invoice.subscription as string
+        // In Stripe API v20+, subscription is in parent.subscription_details
+        const subscriptionDetails = invoice.parent?.subscription_details
+        const subscriptionId = subscriptionDetails?.subscription
+          ? (typeof subscriptionDetails.subscription === 'string'
+              ? subscriptionDetails.subscription
+              : subscriptionDetails.subscription.id)
+          : null
 
         console.log('Payment failed for subscription:', subscriptionId)
 
