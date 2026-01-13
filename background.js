@@ -1,16 +1,18 @@
-// TweetGuard Background Script
-// Handles API calls to server and scan limits
+// Kitha Background Script
+// Handles API calls to server with authentication and rate limiting
 
-const API_URL = 'https://twitteraireporter-production.up.railway.app';
+// API endpoints - use Vercel for authenticated requests, Railway for free tier
+const VERCEL_API_URL = 'https://www.kitha.co'; // Update with your Vercel URL
+const RAILWAY_API_URL = 'https://twitteraireporter-production.up.railway.app';
 const FREE_SCAN_LIMIT = 50;
 
 // Logging helper
 function log(message, data = null) {
   const timestamp = new Date().toISOString();
   if (data) {
-    console.log(`[TweetGuard BG ${timestamp}] ${message}`, data);
+    console.log(`[Kitha BG ${timestamp}] ${message}`, data);
   } else {
-    console.log(`[TweetGuard BG ${timestamp}] ${message}`);
+    console.log(`[Kitha BG ${timestamp}] ${message}`);
   }
 }
 
@@ -52,11 +54,11 @@ async function canScan() {
   };
 }
 
-// Increment scan counter
+// Increment scan counter (local tracking)
 async function incrementScanCount() {
   const data = await chrome.storage.local.get(['dailyScans', 'tweetsScanned', 'apiKey']);
 
-  // Don't count daily limit for pro users
+  // Don't count daily limit for pro users (server handles this)
   if (data.apiKey) {
     await chrome.storage.local.set({
       tweetsScanned: (data.tweetsScanned || 0) + 1
@@ -64,7 +66,7 @@ async function incrementScanCount() {
     return;
   }
 
-  // Increment both daily and total
+  // Increment both daily and total for free users
   await chrome.storage.local.set({
     dailyScans: (data.dailyScans || 0) + 1,
     tweetsScanned: (data.tweetsScanned || 0) + 1
@@ -79,36 +81,69 @@ async function incrementAICount() {
   });
 }
 
-// Call the inference API
+// Call the API for detection
 async function detectAI(text, tweetId) {
   const startTime = performance.now();
-  log(`Starting API call for tweet ${tweetId}`, { textLength: text.length });
+  const data = await chrome.storage.local.get(['apiKey']);
+  const hasApiKey = !!data.apiKey;
+
+  log(`Starting API call for tweet ${tweetId}`, { textLength: text.length, hasApiKey });
 
   try {
-    log(`Fetching ${API_URL}/predict...`);
-    const fetchStart = performance.now();
+    let response;
 
-    const response = await fetch(`${API_URL}/predict`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text, tweetId })
-    });
+    if (hasApiKey) {
+      // Pro user - use Vercel API with authentication
+      log(`Fetching ${VERCEL_API_URL}/api/detect (authenticated)...`);
+      response = await fetch(`${VERCEL_API_URL}/api/detect`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': data.apiKey
+        },
+        body: JSON.stringify({ text, tweetId })
+      });
 
-    const fetchTime = performance.now() - fetchStart;
+      // Handle auth errors
+      if (response.status === 401) {
+        log('API key invalid or expired');
+        return {
+          success: false,
+          error: 'Invalid API key. Please check your key at kitha.co',
+          authError: true
+        };
+      }
+
+      if (response.status === 429) {
+        log('Rate limit exceeded on server');
+        return {
+          success: false,
+          error: 'Rate limit exceeded',
+          limitReached: true
+        };
+      }
+    } else {
+      // Free user - use Railway API directly (rate limited locally)
+      log(`Fetching ${RAILWAY_API_URL}/predict (free tier)...`);
+      response = await fetch(`${RAILWAY_API_URL}/predict`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text })
+      });
+    }
+
+    const fetchTime = performance.now() - startTime;
     log(`Fetch completed in ${fetchTime.toFixed(0)}ms, status: ${response.status}`);
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
 
-    const parseStart = performance.now();
     const result = await response.json();
-    const parseTime = performance.now() - parseStart;
-
     const totalTime = performance.now() - startTime;
-    log(`API call complete in ${totalTime.toFixed(0)}ms (fetch: ${fetchTime.toFixed(0)}ms, parse: ${parseTime.toFixed(0)}ms)`, result);
+    log(`API call complete in ${totalTime.toFixed(0)}ms`, result);
 
     return {
       success: true,
@@ -126,6 +161,34 @@ async function detectAI(text, tweetId) {
   }
 }
 
+// Validate API key with server
+async function validateApiKey(apiKey) {
+  try {
+    const response = await fetch(`${VERCEL_API_URL}/api/user`, {
+      method: 'GET',
+      headers: {
+        'X-API-Key': apiKey
+      }
+    });
+
+    if (response.ok) {
+      const user = await response.json();
+      return {
+        valid: true,
+        user: {
+          email: user.email,
+          subscription: user.subscription
+        }
+      };
+    }
+
+    return { valid: false, error: 'Invalid API key' };
+  } catch (error) {
+    log('API key validation error:', error);
+    return { valid: false, error: 'Could not validate API key' };
+  }
+}
+
 // Handle messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   log(`Received message: ${message.type}`, { tweetId: message.tweetId });
@@ -140,7 +203,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     log(`Processing DETECT_AI for tweet ${message.tweetId}`);
 
     (async () => {
-      // Check if can scan first
+      // Check if can scan first (local check for free users)
       log(`Checking scan limits...`);
       const scanCheck = await canScan();
       log(`Scan check result:`, scanCheck);
@@ -174,6 +237,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (message.type === 'VALIDATE_API_KEY') {
+    validateApiKey(message.apiKey).then(sendResponse);
+    return true;
+  }
+
   if (message.type === 'INCREMENT_SCAN') {
     incrementScanCount().then(() => sendResponse({ success: true }));
     return true;
@@ -192,7 +260,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Initialize on install
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[TweetGuard] Extension installed');
+  console.log('[Kitha] Extension installed');
   chrome.storage.local.set({
     tweetsScanned: 0,
     aiDetected: 0,

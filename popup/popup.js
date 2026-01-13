@@ -1,4 +1,4 @@
-// TweetGuard Popup Script
+// Kitha Popup Script
 
 const FREE_SCAN_LIMIT = 50;
 
@@ -10,22 +10,37 @@ async function loadData() {
       'aiDetected',
       'apiKey',
       'dailyScans',
-      'lastScanDate'
+      'lastScanDate',
+      'userEmail',
+      'userSubscription'
     ], resolve);
   });
 }
 
-// Save API key
-async function saveApiKey(key) {
+// Save API key and user info
+async function saveApiKey(key, userEmail = null, userSubscription = null) {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ apiKey: key }, resolve);
+    const data = { apiKey: key };
+    if (userEmail) data.userEmail = userEmail;
+    if (userSubscription) data.userSubscription = userSubscription;
+    chrome.storage.local.set(data, resolve);
   });
 }
 
 // Remove API key
 async function removeApiKey() {
   return new Promise((resolve) => {
-    chrome.storage.local.remove('apiKey', resolve);
+    chrome.storage.local.remove(['apiKey', 'userEmail', 'userSubscription'], resolve);
+  });
+}
+
+// Validate API key with server
+async function validateApiKeyWithServer(key) {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage(
+      { type: 'VALIDATE_API_KEY', apiKey: key },
+      resolve
+    );
   });
 }
 
@@ -68,10 +83,16 @@ async function updateUI() {
   if (hasApiKey) {
     // Pro user with API key
     apiIcon.textContent = '🔓';
-    apiText.textContent = 'Pro Plan (Unlimited)';
+    const subscriptionText = data.userSubscription === 'pro' ? 'Pro Plan (Unlimited)' : 'Logged In';
+    apiText.textContent = data.userEmail ? `${subscriptionText}` : 'Pro Plan (Unlimited)';
     apiButton.textContent = 'Remove API Key';
     apiButton.classList.add('remove');
     scanLimitSection.classList.add('hidden');
+
+    // Show email if available
+    if (data.userEmail) {
+      apiText.innerHTML = `${subscriptionText}<br><small style="opacity: 0.7">${data.userEmail}</small>`;
+    }
   } else {
     // Free user
     apiIcon.textContent = '🔒';
@@ -109,6 +130,7 @@ function toggleApiInput(show) {
     apiSection.classList.add('hidden');
     apiInputSection.classList.remove('hidden');
     document.getElementById('apiKeyInput').focus();
+    document.getElementById('apiError').classList.add('hidden');
   } else {
     apiSection.classList.remove('hidden');
     apiInputSection.classList.add('hidden');
@@ -116,11 +138,23 @@ function toggleApiInput(show) {
   }
 }
 
-// Validate API key format (basic validation)
-function validateApiKey(key) {
-  // Accept any non-empty key for now
-  // In production, you'd validate against your server
-  return key && key.length >= 8;
+// Show loading state on save button
+function setLoading(loading) {
+  const saveBtn = document.getElementById('saveApiKey');
+  if (loading) {
+    saveBtn.textContent = 'Validating...';
+    saveBtn.disabled = true;
+  } else {
+    saveBtn.textContent = 'Save';
+    saveBtn.disabled = false;
+  }
+}
+
+// Show error message
+function showError(message) {
+  const errorEl = document.getElementById('apiError');
+  errorEl.textContent = message;
+  errorEl.classList.remove('hidden');
 }
 
 // Event listeners
@@ -151,14 +185,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('saveApiKey').addEventListener('click', async () => {
     const key = document.getElementById('apiKeyInput').value.trim();
 
-    if (!validateApiKey(key)) {
-      alert('Please enter a valid API key (at least 8 characters)');
+    if (!key || key.length < 8) {
+      showError('Please enter a valid API key (at least 8 characters)');
       return;
     }
 
-    await saveApiKey(key);
-    toggleApiInput(false);
-    updateUI();
+    setLoading(true);
+
+    // Validate with server
+    const result = await validateApiKeyWithServer(key);
+
+    setLoading(false);
+
+    if (result.valid) {
+      await saveApiKey(key, result.user?.email, result.user?.subscription);
+      toggleApiInput(false);
+      updateUI();
+    } else {
+      showError(result.error || 'Invalid API key. Please check and try again.');
+    }
   });
 
   // Cancel API key input
@@ -171,5 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') {
       document.getElementById('saveApiKey').click();
     }
+  });
+
+  // Clear error on input
+  document.getElementById('apiKeyInput').addEventListener('input', () => {
+    document.getElementById('apiError').classList.add('hidden');
   });
 });

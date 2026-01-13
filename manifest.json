@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "TweetGuard AI Detector",
+  "name": "Kitha - AI Tweet Detector",
   "version": "2.0.0",
   "description": "Real-time AI detection badges for Twitter/X tweets",
   "permissions": ["storage"],

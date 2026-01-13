@@ -3,8 +3,19 @@ import { prisma } from '@/lib/db'
 import { cookies } from 'next/headers'
 import { v4 as uuidv4 } from 'uuid'
 
-// Helper to get current user from session
-async function getCurrentUser() {
+// CORS headers for extension
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
+}
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders })
+}
+
+// Helper to get current user from session cookie
+async function getCurrentUserFromSession() {
   const cookieStore = await cookies()
   const session = cookieStore.get('session')?.value
 
@@ -24,14 +35,34 @@ async function getCurrentUser() {
   return user
 }
 
-export async function GET() {
+// Helper to get current user from API key
+async function getCurrentUserFromApiKey(apiKey: string) {
+  const user = await prisma.user.findUnique({
+    where: { apiKey },
+    include: {
+      subscriptionData: true,
+    },
+  })
+
+  return user
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    // Check for API key header first (for extension)
+    const apiKey = request.headers.get('X-API-Key')
+
+    let user
+    if (apiKey) {
+      user = await getCurrentUserFromApiKey(apiKey)
+    } else {
+      user = await getCurrentUserFromSession()
+    }
 
     if (!user) {
       return NextResponse.json(
         { error: 'Not authenticated' },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       )
     }
 
@@ -74,19 +105,19 @@ export async function GET() {
           aiDetected: totalUsage._sum.aiDetected || 0,
         },
       },
-    })
+    }, { headers: corsHeaders })
   } catch (error) {
     console.error('User GET error:', error)
     return NextResponse.json(
       { error: 'Failed to get user' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUserFromSession()
     const body = await request.json()
     const { action } = body
 
@@ -94,14 +125,14 @@ export async function POST(request: NextRequest) {
       case 'logout': {
         const cookieStore = await cookies()
         cookieStore.delete('session')
-        return NextResponse.json({ success: true })
+        return NextResponse.json({ success: true }, { headers: corsHeaders })
       }
 
       case 'regenerate-api-key': {
         if (!user) {
           return NextResponse.json(
             { error: 'Not authenticated' },
-            { status: 401 }
+            { status: 401, headers: corsHeaders }
           )
         }
 
@@ -111,20 +142,20 @@ export async function POST(request: NextRequest) {
           data: { apiKey: newApiKey },
         })
 
-        return NextResponse.json({ success: true, apiKey: newApiKey })
+        return NextResponse.json({ success: true, apiKey: newApiKey }, { headers: corsHeaders })
       }
 
       default:
         return NextResponse.json(
           { error: 'Unknown action' },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         )
     }
   } catch (error) {
     console.error('User POST error:', error)
     return NextResponse.json(
       { error: 'Failed to process request' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     )
   }
 }

@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TweetGuard AI Detector</title>
+  <title>Kitha - AI Tweet Detector</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
     <header class="header">
       <div class="logo">🛡️</div>
-      <h1>TweetGuard AI</h1>
+      <h1>Kitha</h1>
       <p class="tagline">AI Detection for Twitter</p>
     </header>
 
@@ -37,11 +37,12 @@
     <!-- API Key Input (hidden by default) -->
     <div class="api-input-section hidden" id="apiInputSection">
       <input type="text" class="api-input" id="apiKeyInput" placeholder="Enter your API key">
+      <p class="api-error hidden" id="apiError"></p>
       <div class="api-buttons">
         <button class="btn btn-primary" id="saveApiKey">Save</button>
         <button class="btn btn-secondary" id="cancelApiKey">Cancel</button>
       </div>
-      <p class="api-hint">Get your API key at tweetguard.ai</p>
+      <p class="api-hint">Get your API key at <a href="https://kitha.co/dashboard" target="_blank">kitha.co</a></p>
     </div>
 
     <div class="stats">
@@ -78,7 +79,7 @@
 
     <footer class="footer">
       <p>Powered by DistilBERT</p>
-      <p class="version">v1.0.0</p>
+      <p class="version">v2.0.0</p>
     </footer>
   </div>
 
