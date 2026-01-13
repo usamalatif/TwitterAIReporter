@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { cookies } from 'next/headers'
 import { v4 as uuidv4 } from 'uuid'
+import { createCheckoutSession, createBillingPortalSession, PLANS, isStripeConfigured } from '@/lib/stripe'
 
 // CORS headers for extension
 const corsHeaders = {
@@ -143,6 +144,57 @@ export async function POST(request: NextRequest) {
         })
 
         return NextResponse.json({ success: true, apiKey: newApiKey }, { headers: corsHeaders })
+      }
+
+      case 'create-checkout': {
+        if (!user) {
+          return NextResponse.json(
+            { error: 'Not authenticated' },
+            { status: 401, headers: corsHeaders }
+          )
+        }
+
+        if (!isStripeConfigured()) {
+          return NextResponse.json(
+            { error: 'Stripe is not configured' },
+            { status: 500, headers: corsHeaders }
+          )
+        }
+
+        const session = await createCheckoutSession(
+          user.id,
+          user.email,
+          PLANS.pro.priceId
+        )
+
+        return NextResponse.json({ url: session.url }, { headers: corsHeaders })
+      }
+
+      case 'manage-billing': {
+        if (!user) {
+          return NextResponse.json(
+            { error: 'Not authenticated' },
+            { status: 401, headers: corsHeaders }
+          )
+        }
+
+        if (!isStripeConfigured()) {
+          return NextResponse.json(
+            { error: 'Stripe is not configured' },
+            { status: 500, headers: corsHeaders }
+          )
+        }
+
+        if (!user.stripeCustomerId) {
+          return NextResponse.json(
+            { error: 'No billing account found' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const session = await createBillingPortalSession(user.stripeCustomerId)
+
+        return NextResponse.json({ url: session.url }, { headers: corsHeaders })
       }
 
       default:

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
+import { prisma } from '@/lib/db'
 import Stripe from 'stripe'
-
-// Simplified webhook - stores in memory for now
-// TODO: Add database when Postgres is set up
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -35,22 +33,137 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        console.log('Checkout completed for:', session.customer_email)
-        // TODO: Update user subscription in database
+        const userId = session.metadata?.userId
+        const customerId = session.customer as string
+        const subscriptionId = session.subscription as string
+
+        console.log('Checkout completed for userId:', userId, 'customerId:', customerId)
+
+        if (!userId) {
+          console.error('No userId in session metadata')
+          break
+        }
+
+        // Get subscription details from Stripe
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+
+        // Update user with Stripe customer ID and subscription
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            stripeCustomerId: customerId,
+            subscription: 'pro',
+          },
+        })
+
+        // Create or update subscription record
+        await prisma.subscription.upsert({
+          where: { userId },
+          create: {
+            userId,
+            stripeSubscriptionId: subscriptionId,
+            status: 'active',
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          },
+          update: {
+            stripeSubscriptionId: subscriptionId,
+            status: 'active',
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          },
+        })
+
+        console.log('User upgraded to pro:', userId)
         break
       }
 
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
-        console.log('Subscription updated:', subscription.id, 'Status:', subscription.status)
-        // TODO: Update subscription status in database
+        const subscriptionId = subscription.id
+        const status = subscription.status
+
+        console.log('Subscription updated:', subscriptionId, 'Status:', status)
+
+        // Find subscription in database
+        const existingSubscription = await prisma.subscription.findUnique({
+          where: { stripeSubscriptionId: subscriptionId },
+        })
+
+        if (existingSubscription) {
+          // Map Stripe status to our status
+          let dbStatus: 'active' | 'canceled' | 'past_due' = 'active'
+          if (status === 'canceled' || status === 'unpaid') {
+            dbStatus = 'canceled'
+          } else if (status === 'past_due') {
+            dbStatus = 'past_due'
+          }
+
+          await prisma.subscription.update({
+            where: { stripeSubscriptionId: subscriptionId },
+            data: {
+              status: dbStatus,
+              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            },
+          })
+
+          // If canceled, downgrade user to free
+          if (dbStatus === 'canceled') {
+            await prisma.user.update({
+              where: { id: existingSubscription.userId },
+              data: { subscription: 'free' },
+            })
+            console.log('User downgraded to free:', existingSubscription.userId)
+          }
+        }
         break
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
-        console.log('Subscription deleted:', subscription.id)
-        // TODO: Cancel subscription in database
+        const subscriptionId = subscription.id
+
+        console.log('Subscription deleted:', subscriptionId)
+
+        // Find and update subscription
+        const existingSubscription = await prisma.subscription.findUnique({
+          where: { stripeSubscriptionId: subscriptionId },
+        })
+
+        if (existingSubscription) {
+          // Update subscription status
+          await prisma.subscription.update({
+            where: { stripeSubscriptionId: subscriptionId },
+            data: { status: 'canceled' },
+          })
+
+          // Downgrade user to free
+          await prisma.user.update({
+            where: { id: existingSubscription.userId },
+            data: { subscription: 'free' },
+          })
+
+          console.log('User downgraded to free after subscription deletion:', existingSubscription.userId)
+        }
+        break
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        const subscriptionId = invoice.subscription as string
+
+        console.log('Payment failed for subscription:', subscriptionId)
+
+        if (subscriptionId) {
+          const existingSubscription = await prisma.subscription.findUnique({
+            where: { stripeSubscriptionId: subscriptionId },
+          })
+
+          if (existingSubscription) {
+            await prisma.subscription.update({
+              where: { stripeSubscriptionId: subscriptionId },
+              data: { status: 'past_due' },
+            })
+          }
+        }
         break
       }
     }

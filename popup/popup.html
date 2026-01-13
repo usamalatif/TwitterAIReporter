@@ -9,8 +9,8 @@
 <body>
   <div class="container">
     <header class="header">
-      <div class="logo">🛡️</div>
-      <h1>Kitha</h1>
+      <img src="icons/icon48.png" alt="Kitha" class="logo-img">
+      <h1><span class="logo-text">kith</span><span class="logo-accent">a</span></h1>
       <p class="tagline">AI Detection for Twitter</p>
     </header>
 
@@ -43,6 +43,15 @@
         <button class="btn btn-secondary" id="cancelApiKey">Cancel</button>
       </div>
       <p class="api-hint">Get your API key at <a href="https://kitha.co/dashboard" target="_blank">kitha.co</a></p>
+    </div>
+
+    <!-- Remove API Key Confirmation (hidden by default) -->
+    <div class="api-input-section hidden" id="removeConfirmSection">
+      <p class="confirm-text">Remove your API key? You will be limited to 50 scans per day.</p>
+      <div class="api-buttons">
+        <button class="btn btn-danger" id="confirmRemoveKey">Remove</button>
+        <button class="btn btn-secondary" id="cancelRemoveKey">Cancel</button>
+      </div>
     </div>
 
     <div class="stats">

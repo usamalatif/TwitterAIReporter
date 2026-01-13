@@ -41,9 +41,12 @@ function LoginContent() {
       <div className="w-full max-w-md">
         <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-8 backdrop-blur-sm">
           <div className="mb-8 text-center">
-            <a href="/" className="inline-flex items-center gap-2">
-              <span className="text-3xl">🛡️</span>
-              <span className="text-2xl font-bold text-white">Kitha</span>
+            <a href="/" className="inline-flex items-center gap-3">
+              <img src="/icon.svg" alt="Kitha" className="h-10 w-10" />
+              <span className="text-2xl font-extrabold">
+                <span className="text-white">kith</span>
+                <span className="text-[#F97316]">a</span>
+              </span>
             </a>
             <p className="mt-2 text-slate-400">Sign in to your account</p>
           </div>

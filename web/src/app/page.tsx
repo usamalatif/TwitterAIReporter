@@ -39,9 +39,12 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🛡️</span>
-            <span className="text-xl font-bold text-white">Kitha</span>
+          <div className="flex items-center gap-3">
+            <img src="/icon.svg" alt="Kitha" className="h-8 w-8" />
+            <span className="text-xl font-extrabold">
+              <span className="text-white">kith</span>
+              <span className="text-[#F97316]">a</span>
+            </span>
           </div>
           <a
             href="/login"
@@ -303,9 +306,12 @@ export default function LandingPage() {
       <footer className="border-t border-slate-800 py-12">
         <div className="container mx-auto px-6">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🛡️</span>
-              <span className="text-xl font-bold text-white">Kitha</span>
+            <div className="flex items-center gap-3">
+              <img src="/icon.svg" alt="Kitha" className="h-8 w-8" />
+              <span className="text-xl font-extrabold">
+                <span className="text-white">kith</span>
+                <span className="text-[#F97316]">a</span>
+              </span>
             </div>
             <div className="flex gap-6 text-sm text-slate-400">
               <a href="/privacy" className="transition hover:text-white">Privacy Policy</a>

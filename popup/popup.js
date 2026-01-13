@@ -125,16 +125,36 @@ async function updateUI() {
 function toggleApiInput(show) {
   const apiSection = document.getElementById('apiSection');
   const apiInputSection = document.getElementById('apiInputSection');
+  const removeConfirmSection = document.getElementById('removeConfirmSection');
 
   if (show) {
     apiSection.classList.add('hidden');
     apiInputSection.classList.remove('hidden');
+    removeConfirmSection.classList.add('hidden');
     document.getElementById('apiKeyInput').focus();
     document.getElementById('apiError').classList.add('hidden');
   } else {
     apiSection.classList.remove('hidden');
     apiInputSection.classList.add('hidden');
+    removeConfirmSection.classList.add('hidden');
     document.getElementById('apiKeyInput').value = '';
+  }
+}
+
+// Toggle remove confirmation section
+function toggleRemoveConfirm(show) {
+  const apiSection = document.getElementById('apiSection');
+  const apiInputSection = document.getElementById('apiInputSection');
+  const removeConfirmSection = document.getElementById('removeConfirmSection');
+
+  if (show) {
+    apiSection.classList.add('hidden');
+    apiInputSection.classList.add('hidden');
+    removeConfirmSection.classList.remove('hidden');
+  } else {
+    apiSection.classList.remove('hidden');
+    apiInputSection.classList.add('hidden');
+    removeConfirmSection.classList.add('hidden');
   }
 }
 
@@ -170,15 +190,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = await loadData();
 
     if (data.apiKey) {
-      // Remove API key
-      if (confirm('Remove your API key? You will be limited to 50 scans per day.')) {
-        await removeApiKey();
-        updateUI();
-      }
+      // Show remove confirmation UI
+      toggleRemoveConfirm(true);
     } else {
       // Show input section
       toggleApiInput(true);
     }
+  });
+
+  // Confirm remove API key
+  document.getElementById('confirmRemoveKey').addEventListener('click', async () => {
+    await removeApiKey();
+    toggleRemoveConfirm(false);
+    updateUI();
+  });
+
+  // Cancel remove API key
+  document.getElementById('cancelRemoveKey').addEventListener('click', () => {
+    toggleRemoveConfirm(false);
   });
 
   // Save API key
