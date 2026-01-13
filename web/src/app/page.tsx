@@ -41,7 +41,7 @@ export default function LandingPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🛡️</span>
-            <span className="text-xl font-bold text-white">TweetGuard</span>
+            <span className="text-xl font-bold text-white">Kitha</span>
           </div>
           <a
             href="/login"
@@ -69,7 +69,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-2xl text-xl text-slate-300">
-            TweetGuard uses advanced AI to analyze tweets and show you which ones are
+            Kitha uses advanced AI to analyze tweets and show you which ones are
             likely written by AI. Stay informed about what you&apos;re reading on Twitter/X.
           </p>
 
@@ -168,7 +168,7 @@ export default function LandingPage() {
             </div>
             <h3 className="mb-2 text-xl font-semibold text-white">1. Install Extension</h3>
             <p className="text-slate-400">
-              Add TweetGuard to Chrome with one click. No configuration needed.
+              Add Kitha to Chrome with one click. No configuration needed.
             </p>
           </div>
           <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">
@@ -177,7 +177,7 @@ export default function LandingPage() {
             </div>
             <h3 className="mb-2 text-xl font-semibold text-white">2. Browse Twitter</h3>
             <p className="text-slate-400">
-              Use Twitter/X normally. TweetGuard works silently in the background.
+              Use Twitter/X normally. Kitha works silently in the background.
             </p>
           </div>
           <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">
@@ -271,7 +271,7 @@ export default function LandingPage() {
           </div>
           <div className="rounded-xl bg-white/5 p-6 backdrop-blur-sm">
             <h3 className="mb-2 text-lg font-semibold text-white">
-              Does TweetGuard store my data?
+              Does Kitha store my data?
             </h3>
             <p className="text-slate-400">
               We only store anonymized tweet IDs for caching purposes (24 hours). We never store
@@ -280,10 +280,10 @@ export default function LandingPage() {
           </div>
           <div className="rounded-xl bg-white/5 p-6 backdrop-blur-sm">
             <h3 className="mb-2 text-lg font-semibold text-white">
-              Can I use TweetGuard on mobile?
+              Can I use Kitha on mobile?
             </h3>
             <p className="text-slate-400">
-              Currently, TweetGuard is only available as a Chrome extension for desktop. We&apos;re
+              Currently, Kitha is only available as a Chrome extension for desktop. We&apos;re
               exploring mobile options for the future.
             </p>
           </div>
@@ -305,15 +305,15 @@ export default function LandingPage() {
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <div className="flex items-center gap-2">
               <span className="text-2xl">🛡️</span>
-              <span className="text-xl font-bold text-white">TweetGuard</span>
+              <span className="text-xl font-bold text-white">Kitha</span>
             </div>
             <div className="flex gap-6 text-sm text-slate-400">
               <a href="/privacy" className="transition hover:text-white">Privacy Policy</a>
               <a href="/terms" className="transition hover:text-white">Terms of Service</a>
-              <a href="mailto:support@tweetguard.ai" className="transition hover:text-white">Contact</a>
+              <a href="mailto:support@kitha.co" className="transition hover:text-white">Contact</a>
             </div>
             <p className="text-sm text-slate-500">
-              © 2024 TweetGuard. All rights reserved.
+              © 2025 Kitha. All rights reserved.
             </p>
           </div>
         </div>

@@ -97,7 +97,7 @@ function DashboardContent() {
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
           <a href="/" className="flex items-center gap-2">
             <span className="text-2xl">🛡️</span>
-            <span className="text-xl font-bold text-white">TweetGuard</span>
+            <span className="text-xl font-bold text-white">Kitha</span>
           </a>
           <div className="flex items-center gap-4">
             <span className="text-sm text-slate-400">{user.email}</span>
@@ -115,7 +115,7 @@ function DashboardContent() {
         {/* Success/Canceled Messages */}
         {success && (
           <div className="mb-6 rounded-xl bg-green-500/20 p-4 text-green-400">
-            🎉 Welcome to TweetGuard Pro! Your subscription is now active.
+            🎉 Welcome to Kitha Pro! Your subscription is now active.
           </div>
         )}
         {canceled && (
@@ -245,7 +245,7 @@ function DashboardContent() {
             <div>
               <h3 className="mb-2 font-medium text-white">1. Install the Extension</h3>
               <p className="mb-4 text-sm text-slate-400">
-                Download TweetGuard from the Chrome Web Store.
+                Download Kitha from the Chrome Web Store.
               </p>
               <a
                 href="#"
@@ -257,7 +257,7 @@ function DashboardContent() {
             <div>
               <h3 className="mb-2 font-medium text-white">2. Enter Your API Key</h3>
               <p className="text-sm text-slate-400">
-                Click the TweetGuard icon in your browser, then paste your API key in the settings.
+                Click the Kitha icon in your browser, then paste your API key in the settings.
                 The extension will automatically start detecting AI-generated tweets.
               </p>
             </div>

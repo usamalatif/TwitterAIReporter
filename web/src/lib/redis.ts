@@ -11,7 +11,7 @@ export const freeTierLimiter = new Ratelimit({
   redis,
   limiter: Ratelimit.fixedWindow(50, '24 h'),
   analytics: true,
-  prefix: 'tweetguard:free',
+  prefix: 'kitha:free',
 })
 
 // Cache helpers

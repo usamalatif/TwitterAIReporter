@@ -43,7 +43,7 @@ function LoginContent() {
           <div className="mb-8 text-center">
             <a href="/" className="inline-flex items-center gap-2">
               <span className="text-3xl">🛡️</span>
-              <span className="text-2xl font-bold text-white">TweetGuard</span>
+              <span className="text-2xl font-bold text-white">Kitha</span>
             </a>
             <p className="mt-2 text-slate-400">Sign in to your account</p>
           </div>
