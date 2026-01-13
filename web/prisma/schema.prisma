@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SubscriptionTier {
+  free
+  pro
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  past_due
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  createdAt         DateTime @default(now())
+  subscription      SubscriptionTier @default(free)
+  stripeCustomerId  String?
+  apiKey            String   @unique @default(uuid())
+  apiKeyHash        String?
+
+  usage             Usage[]
+  subscriptionData  Subscription?
+  betaSignup        BetaSignup?
+}
+
+model Usage {
+  id          String   @id @default(uuid())
+  userId      String
+  date        DateTime @db.Date
+  scanCount   Int      @default(0)
+  aiDetected  Int      @default(0)
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model Subscription {
+  id                     String             @id @default(uuid())
+  userId                 String             @unique
+  stripeSubscriptionId   String             @unique
+  status                 SubscriptionStatus @default(active)
+  currentPeriodEnd       DateTime
+
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MagicLink {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model BetaSignup {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  userId    String?  @unique
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}

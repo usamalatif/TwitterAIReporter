@@ -1,0 +1,115 @@
+/* TweetGuard AI Detector - Badge Styles */
+
+.ai-detector-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  margin-left: 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: help;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.ai-detector-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Human - Green */
+.ai-badge-human {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+/* Uncertain - Orange */
+.ai-badge-uncertain {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  color: #e65100;
+  border: 1px solid #ffcc80;
+}
+
+/* AI - Red */
+.ai-badge-ai {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.ai-badge-emoji {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.ai-badge-text {
+  font-size: 11px;
+  letter-spacing: 0.3px;
+}
+
+/* Dark mode support (Twitter/X dark theme) */
+@media (prefers-color-scheme: dark) {
+  .ai-badge-human {
+    background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+    color: #95d5b2;
+    border: 1px solid #40916c;
+  }
+
+  .ai-badge-uncertain {
+    background: linear-gradient(135deg, #5c4033 0%, #8b5a2b 100%);
+    color: #ffd699;
+    border: 1px solid #cc8800;
+  }
+
+  .ai-badge-ai {
+    background: linear-gradient(135deg, #4a1a1a 0%, #6b2020 100%);
+    color: #ffb3b3;
+    border: 1px solid #cc4444;
+  }
+}
+
+/* Twitter's dark mode class detection */
+[data-color-scheme="dark"] .ai-badge-human,
+.dark .ai-badge-human {
+  background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+  color: #95d5b2;
+  border: 1px solid #40916c;
+}
+
+[data-color-scheme="dark"] .ai-badge-uncertain,
+.dark .ai-badge-uncertain {
+  background: linear-gradient(135deg, #5c4033 0%, #8b5a2b 100%);
+  color: #ffd699;
+  border: 1px solid #cc8800;
+}
+
+[data-color-scheme="dark"] .ai-badge-ai,
+.dark .ai-badge-ai {
+  background: linear-gradient(135deg, #4a1a1a 0%, #6b2020 100%);
+  color: #ffb3b3;
+  border: 1px solid #cc4444;
+}
+
+/* Loading state */
+.ai-badge-loading {
+  background: linear-gradient(135deg, #e3e3e3 0%, #f5f5f5 100%);
+  color: #888;
+  border: 1px solid #ddd;
+  animation: pulse-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-loading {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+[data-color-scheme="dark"] .ai-badge-loading,
+.dark .ai-badge-loading {
+  background: linear-gradient(135deg, #333 0%, #444 100%);
+  color: #aaa;
+  border: 1px solid #555;
+}
