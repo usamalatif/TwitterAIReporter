@@ -1,88 +1,22 @@
 // TweetGuard AI Detector - Content Script
-// Detects and labels AI-generated tweets in real-time
+// Detects and labels AI-generated tweets using server API
 
 (function() {
   'use strict';
 
+  // Logging helper
+  function log(message, data = null) {
+    const timestamp = new Date().toISOString();
+    if (data) {
+      console.log(`[TweetGuard CS ${timestamp}] ${message}`, data);
+    } else {
+      console.log(`[TweetGuard CS ${timestamp}] ${message}`);
+    }
+  }
+
   // Track processed tweets
   const processedTweets = new Set();
-  let tweetsScanned = 0;
-  let aiDetected = 0;
-  let modelLoaded = false;
   let scanLimitReached = false;
-  let requestIdCounter = 0;
-  const pendingRequests = new Map();
-
-  // Send message to background via loader bridge
-  function sendToBackground(type, data = {}) {
-    return new Promise((resolve, reject) => {
-      const requestId = ++requestIdCounter;
-
-      const handler = (event) => {
-        if (event.source !== window) return;
-        const msg = event.data;
-        if (!msg || msg.source !== 'tweetguard-loader' || msg.requestId !== requestId) return;
-
-        window.removeEventListener('message', handler);
-        pendingRequests.delete(requestId);
-
-        if (msg.error) {
-          reject(new Error(msg.error));
-        } else {
-          resolve(msg.response);
-        }
-      };
-
-      pendingRequests.set(requestId, handler);
-      window.addEventListener('message', handler);
-
-      window.postMessage({
-        source: 'tweetguard-content',
-        type: type,
-        data: data,
-        requestId: requestId
-      }, '*');
-
-      // Timeout after 5 seconds
-      setTimeout(() => {
-        if (pendingRequests.has(requestId)) {
-          window.removeEventListener('message', handler);
-          pendingRequests.delete(requestId);
-          reject(new Error('Request timeout'));
-        }
-      }, 5000);
-    });
-  }
-
-  // Check if we can scan (API key or under limit)
-  async function canScan() {
-    try {
-      const result = await sendToBackground('CHECK_CAN_SCAN');
-      return result;
-    } catch (e) {
-      console.error('[TweetGuard] Error checking scan limit:', e);
-      // Allow scanning on error (fail open)
-      return { allowed: true, isPro: false };
-    }
-  }
-
-  // Increment scan counter
-  async function incrementScan() {
-    try {
-      await sendToBackground('INCREMENT_SCAN');
-    } catch (e) {
-      console.error('[TweetGuard] Error incrementing scan:', e);
-    }
-  }
-
-  // Increment AI counter
-  async function incrementAI() {
-    try {
-      await sendToBackground('INCREMENT_AI');
-    } catch (e) {
-      console.error('[TweetGuard] Error incrementing AI count:', e);
-    }
-  }
 
   // Determine badge style based on score
   function getBadgeInfo(result) {
@@ -189,8 +123,27 @@
     return null;
   }
 
+  // Add error badge
+  function addErrorBadge(tweetElement) {
+    if (tweetElement.querySelector('.ai-detector-badge')) {
+      return;
+    }
+
+    const badge = document.createElement('span');
+    badge.className = 'ai-detector-badge ai-badge-loading';
+    badge.title = 'Failed to analyze tweet';
+    badge.innerHTML = '<span class="ai-badge-emoji">⚠️</span><span class="ai-badge-text">Error</span>';
+
+    const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
+    if (usernameContainer) {
+      const innerContainer = usernameContainer.querySelector('div[dir="ltr"]') || usernameContainer;
+      innerContainer.appendChild(badge);
+    }
+  }
+
   // Process a single tweet element
   async function processTweet(tweetElement) {
+    const startTime = performance.now();
     const tweetId = getTweetId(tweetElement);
 
     if (!tweetId || processedTweets.has(tweetId)) {
@@ -201,20 +154,14 @@
 
     // Skip tweets with very short text
     if (!text || text.length < 20) {
+      log(`Skipping tweet ${tweetId} - text too short (${text?.length || 0} chars)`);
       return;
     }
 
+    log(`Processing tweet ${tweetId}`, { textLength: text.length, textPreview: text.substring(0, 50) + '...' });
     processedTweets.add(tweetId);
 
-    // Check scan limit before processing
-    if (!scanLimitReached) {
-      const scanCheck = await canScan();
-      if (!scanCheck.allowed) {
-        scanLimitReached = true;
-        showLimitNotification();
-      }
-    }
-
+    // If limit already reached, show limit badge
     if (scanLimitReached) {
       addLimitBadge(tweetElement);
       return;
@@ -224,36 +171,56 @@
     const loadingBadge = addLoadingBadge(tweetElement);
 
     try {
-      // Run AI detection
-      const result = await detector.detect(text, tweetId);
+      // Send to background script for API call
+      log(`Sending message to background for tweet ${tweetId}...`);
+      const msgStartTime = performance.now();
+
+      const result = await chrome.runtime.sendMessage({
+        type: 'DETECT_AI',
+        text: text,
+        tweetId: tweetId
+      });
+
+      const msgTime = performance.now() - msgStartTime;
+      log(`Background response received in ${msgTime.toFixed(0)}ms`, result);
 
       // Remove loading badge
       if (loadingBadge) {
         loadingBadge.remove();
       }
 
-      // Add result badge
-      addAIBadge(tweetElement, result);
+      if (result.limitReached) {
+        scanLimitReached = true;
+        addLimitBadge(tweetElement);
+        showLimitNotification();
+        return;
+      }
 
-      // Update stats via background
-      await incrementScan();
-      tweetsScanned++;
-
-      if (result.isAI) {
-        await incrementAI();
-        aiDetected++;
+      if (result.success) {
+        addAIBadge(tweetElement, result);
+        const totalTime = performance.now() - startTime;
+        log(`Tweet ${tweetId} processed successfully in ${totalTime.toFixed(0)}ms - AI: ${(result.aiProb * 100).toFixed(1)}%`);
+      } else {
+        addErrorBadge(tweetElement);
+        log(`Tweet ${tweetId} failed - no success`);
       }
 
     } catch (error) {
-      console.error('[TweetGuard] Error processing tweet:', error);
+      const totalTime = performance.now() - startTime;
+      log(`Error processing tweet ${tweetId} after ${totalTime.toFixed(0)}ms: ${error.message}`);
       if (loadingBadge) {
         loadingBadge.remove();
       }
+      addErrorBadge(tweetElement);
     }
   }
 
   // Show notification when limit is reached
   function showLimitNotification() {
+    if (document.getElementById('tweetguard-limit-notification')) {
+      return;
+    }
+
     const notification = document.createElement('div');
     notification.id = 'tweetguard-limit-notification';
     notification.innerHTML = `
@@ -321,13 +288,19 @@
   // Find and observe all tweet elements
   function observeTweets() {
     const tweets = document.querySelectorAll('[data-testid="tweet"]');
+    let newTweets = 0;
 
     tweets.forEach((tweet) => {
       if (!tweet.hasAttribute('data-ai-observed')) {
         tweet.setAttribute('data-ai-observed', 'true');
         intersectionObserver.observe(tweet);
+        newTweets++;
       }
     });
+
+    if (newTweets > 0) {
+      log(`Found ${newTweets} new tweets to observe (total on page: ${tweets.length})`);
+    }
   }
 
   // Mutation Observer for infinite scroll
@@ -358,67 +331,20 @@
     });
   }
 
-  // Show loading status
-  function showLoadingStatus() {
-    const status = document.createElement('div');
-    status.id = 'tweetguard-status';
-    status.innerHTML = `
-      <div style="
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 12px;
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 14px;
-        z-index: 10000;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      ">
-        <div style="
-          width: 20px;
-          height: 20px;
-          border: 2px solid rgba(255,255,255,0.3);
-          border-top-color: white;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        "></div>
-        <span>Loading AI Detection Model...</span>
-      </div>
-      <style>
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      </style>
-    `;
-    document.body.appendChild(status);
-    return status;
-  }
-
   // Initialize the extension
   async function init() {
-    console.log('[TweetGuard] Starting initialization...');
-
-    // Show loading status
-    const loadingStatus = showLoadingStatus();
+    const initStartTime = performance.now();
+    log('Starting initialization...');
 
     try {
       // Wait for Twitter DOM
+      log('Waiting for Twitter DOM...');
+      const waitStart = performance.now();
       await waitForTwitter();
-
-      // Initialize AI detector (loads model)
-      console.log('[TweetGuard] Loading AI model...');
-      await detector.initialize();
-      modelLoaded = true;
-
-      // Remove loading status
-      loadingStatus.remove();
+      log(`Twitter DOM ready in ${(performance.now() - waitStart).toFixed(0)}ms`);
 
       // Start observing tweets
+      log('Starting to observe tweets...');
       observeTweets();
 
       // Watch for new tweets
@@ -427,29 +353,11 @@
         subtree: true
       });
 
-      console.log('[TweetGuard] Initialized successfully!');
-      console.log('[TweetGuard] Memory usage:', detector.getMemoryInfo());
+      const totalInitTime = performance.now() - initStartTime;
+      log(`Initialized successfully in ${totalInitTime.toFixed(0)}ms`);
 
     } catch (error) {
-      console.error('[TweetGuard] Initialization failed:', error);
-      loadingStatus.innerHTML = `
-        <div style="
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
-          background: #ff4444;
-          color: white;
-          padding: 12px 20px;
-          border-radius: 12px;
-          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-          font-size: 14px;
-          z-index: 10000;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        ">
-          ❌ Failed to load AI model
-        </div>
-      `;
-      setTimeout(() => loadingStatus.remove(), 5000);
+      log(`Initialization failed: ${error.message}`);
     }
   }
 

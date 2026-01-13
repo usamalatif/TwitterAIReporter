@@ -5,9 +5,12 @@
 
 const express = require('express');
 const cors = require('cors');
-const tf = require('@tensorflow/tfjs');
+// Use tfjs-node for native C++ bindings - 10-100x faster than pure JS
+const tf = require('@tensorflow/tfjs-node');
 const fs = require('fs');
 const path = require('path');
+
+console.log('TensorFlow.js backend:', tf.getBackend());
 
 const app = express();
 app.use(cors());
@@ -254,8 +257,9 @@ async function predict(text) {
   const attentionMask = tf.tensor2d([encoded.attentionMask], [1, 128], 'int32');
 
   try {
-    // Run inference
-    const outputs = await model.executeAsync({
+    // Run inference - use execute() instead of executeAsync() for better performance
+    // (no control flow or dynamic shapes in this model)
+    const outputs = model.execute({
       'input_ids:0': inputIds,
       'attention_mask:0': attentionMask
     });
@@ -312,6 +316,9 @@ app.get('/health', (req, res) => {
 
 // Prediction endpoint
 app.post('/predict', async (req, res) => {
+  const startTime = Date.now();
+  console.log(`[${new Date().toISOString()}] POST /predict - received request`);
+
   try {
     const { text } = req.body;
 
@@ -323,11 +330,19 @@ app.post('/predict', async (req, res) => {
       return res.status(400).json({ error: 'Text too long (max 1000 chars)' });
     }
 
+    console.log(`[${new Date().toISOString()}] Starting prediction for ${text.length} chars...`);
+    const predictStart = Date.now();
     const result = await predict(text.trim());
+    const predictTime = Date.now() - predictStart;
+
+    const totalTime = Date.now() - startTime;
+    console.log(`[${new Date().toISOString()}] Prediction complete in ${predictTime}ms (total: ${totalTime}ms)`, result);
+
     res.json(result);
 
   } catch (error) {
-    console.error('Prediction error:', error);
+    const totalTime = Date.now() - startTime;
+    console.error(`[${new Date().toISOString()}] Prediction error after ${totalTime}ms:`, error);
     res.status(500).json({ error: 'Prediction failed' });
   }
 });
@@ -338,5 +353,11 @@ const PORT = process.env.PORT || 8000;
 loadModel().then(() => {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 TweetGuard Inference API running on port ${PORT}`);
+
+    // Keep-alive: log memory usage every 5 minutes to prevent Railway sleep
+    setInterval(() => {
+      const mem = tf.memory();
+      console.log(`[Keep-alive] Memory: ${(mem.numBytes / 1024 / 1024).toFixed(1)}MB, Tensors: ${mem.numTensors}`);
+    }, 5 * 60 * 1000);
   });
 });

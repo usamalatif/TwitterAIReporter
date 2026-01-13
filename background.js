@@ -1,7 +1,18 @@
 // TweetGuard Background Script
-// Handles API key validation and scan limits
+// Handles API calls to server and scan limits
 
+const API_URL = 'https://twitteraireporter-production.up.railway.app';
 const FREE_SCAN_LIMIT = 50;
+
+// Logging helper
+function log(message, data = null) {
+  const timestamp = new Date().toISOString();
+  if (data) {
+    console.log(`[TweetGuard BG ${timestamp}] ${message}`, data);
+  } else {
+    console.log(`[TweetGuard BG ${timestamp}] ${message}`);
+  }
+}
 
 // Check if it's a new day and reset counter
 async function checkDailyReset() {
@@ -45,9 +56,8 @@ async function canScan() {
 async function incrementScanCount() {
   const data = await chrome.storage.local.get(['dailyScans', 'tweetsScanned', 'apiKey']);
 
-  // Don't count for pro users
+  // Don't count daily limit for pro users
   if (data.apiKey) {
-    // Just increment total
     await chrome.storage.local.set({
       tweetsScanned: (data.tweetsScanned || 0) + 1
     });
@@ -69,11 +79,99 @@ async function incrementAICount() {
   });
 }
 
+// Call the inference API
+async function detectAI(text, tweetId) {
+  const startTime = performance.now();
+  log(`Starting API call for tweet ${tweetId}`, { textLength: text.length });
+
+  try {
+    log(`Fetching ${API_URL}/predict...`);
+    const fetchStart = performance.now();
+
+    const response = await fetch(`${API_URL}/predict`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text, tweetId })
+    });
+
+    const fetchTime = performance.now() - fetchStart;
+    log(`Fetch completed in ${fetchTime.toFixed(0)}ms, status: ${response.status}`);
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const parseStart = performance.now();
+    const result = await response.json();
+    const parseTime = performance.now() - parseStart;
+
+    const totalTime = performance.now() - startTime;
+    log(`API call complete in ${totalTime.toFixed(0)}ms (fetch: ${fetchTime.toFixed(0)}ms, parse: ${parseTime.toFixed(0)}ms)`, result);
+
+    return {
+      success: true,
+      aiProb: result.aiProb,
+      humanProb: result.humanProb,
+      isAI: result.aiProb > 0.5
+    };
+  } catch (error) {
+    const totalTime = performance.now() - startTime;
+    log(`API error after ${totalTime.toFixed(0)}ms: ${error.message}`);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
 // Handle messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  log(`Received message: ${message.type}`, { tweetId: message.tweetId });
+
   if (message.type === 'CHECK_CAN_SCAN') {
     canScan().then(sendResponse);
-    return true; // Keep channel open for async response
+    return true;
+  }
+
+  if (message.type === 'DETECT_AI') {
+    const msgStartTime = performance.now();
+    log(`Processing DETECT_AI for tweet ${message.tweetId}`);
+
+    (async () => {
+      // Check if can scan first
+      log(`Checking scan limits...`);
+      const scanCheck = await canScan();
+      log(`Scan check result:`, scanCheck);
+
+      if (!scanCheck.allowed) {
+        log(`Scan not allowed - limit reached`);
+        sendResponse({
+          success: false,
+          limitReached: true,
+          remaining: 0
+        });
+        return;
+      }
+
+      // Call the API
+      const result = await detectAI(message.text, message.tweetId);
+
+      if (result.success) {
+        // Increment counters
+        log(`Incrementing counters...`);
+        await incrementScanCount();
+        if (result.isAI) {
+          await incrementAICount();
+        }
+      }
+
+      const totalMsgTime = performance.now() - msgStartTime;
+      log(`Total message handling time: ${totalMsgTime.toFixed(0)}ms`);
+      sendResponse(result);
+    })();
+    return true;
   }
 
   if (message.type === 'INCREMENT_SCAN') {
@@ -87,7 +185,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'GET_SETTINGS') {
-    chrome.storage.local.get(['apiKey', 'dailyScans', 'lastScanDate']).then(sendResponse);
+    chrome.storage.local.get(['apiKey', 'dailyScans', 'lastScanDate', 'tweetsScanned', 'aiDetected']).then(sendResponse);
     return true;
   }
 });
