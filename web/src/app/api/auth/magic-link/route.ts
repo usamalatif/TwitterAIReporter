@@ -54,11 +54,11 @@ export async function POST(request: NextRequest) {
         const result = await resend.emails.send({
           from: fromAddress,
           to: normalizedEmail,
-          subject: 'Sign in to TweetGuard',
+          subject: 'Sign in to Kitha',
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #333;">Sign in to TweetGuard</h2>
-              <p>Click the button below to sign in to your TweetGuard account:</p>
+              <h2 style="color: #333;">Sign in to Kitha</h2>
+              <p>Click the button below to sign in to your Kitha account:</p>
               <a href="${magicLinkUrl}" style="display: inline-block; background: linear-gradient(to right, #8b5cf6, #ec4899); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
                 Sign In
               </a>
