@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  url       = env("DATABASE_URL") // Supabase pooled connection
+  directUrl = env("DIRECT_URL")   // Supabase direct connection for migrations
 }
 
 enum SubscriptionTier {
