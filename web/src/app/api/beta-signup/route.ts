@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+
+// In-memory storage for beta signups (will reset on deploy)
+// TODO: Replace with database when Postgres is set up
+const betaSignups = new Set<string>()
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,24 +25,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if already signed up
-    const existing = await prisma.betaSignup.findUnique({
-      where: { email: email.toLowerCase() },
-    })
+    const normalizedEmail = email.toLowerCase()
 
-    if (existing) {
+    if (betaSignups.has(normalizedEmail)) {
       return NextResponse.json({
         success: true,
         message: "You're already on the list!",
       })
     }
 
-    // Create beta signup
-    await prisma.betaSignup.create({
-      data: {
-        email: email.toLowerCase(),
-      },
-    })
+    betaSignups.add(normalizedEmail)
+    console.log(`Beta signup: ${normalizedEmail} (total: ${betaSignups.size})`)
 
     return NextResponse.json({
       success: true,
@@ -55,11 +51,5 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  try {
-    const count = await prisma.betaSignup.count()
-    return NextResponse.json({ count })
-  } catch (error) {
-    console.error('Beta count error:', error)
-    return NextResponse.json({ count: 0 })
-  }
+  return NextResponse.json({ count: betaSignups.size })
 }

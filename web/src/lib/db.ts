@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client'
+// Database not configured yet
+// TODO: Set up Prisma when Postgres is ready
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+export const prisma = null
+
+export function isDatabaseConfigured() {
+  return false
 }
-
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma

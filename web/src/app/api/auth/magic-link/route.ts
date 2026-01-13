@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendMagicLink } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,11 +21,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await sendMagicLink(email.toLowerCase())
+    // TODO: Implement when database is ready
+    console.log('Magic link requested for:', email.toLowerCase())
 
     return NextResponse.json({
       success: true,
-      message: 'Magic link sent! Check your email.',
+      message: 'Auth not configured yet. Please check back later.',
     })
   } catch (error) {
     console.error('Magic link error:', error)
