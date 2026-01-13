@@ -286,11 +286,11 @@ async function predict(text) {
     }
     probabilities.dispose();
 
-    // Model outputs: probs[0] and probs[1]
-    // Testing shows formal text gets high probs[1], casual text gets high probs[0]
-    // So probs[0] = human, probs[1] = AI (original training labels)
-    const humanProb = probs[0];
-    const aiProb = probs[1];
+    // Model outputs: probs[0] = class 0, probs[1] = class 1
+    // Training labels: 0 = human, 1 = AI
+    // SWAPPED: Testing shows the model outputs are reversed from training labels
+    const aiProb = probs[0];
+    const humanProb = probs[1];
 
     return {
       aiProb: Math.round(aiProb * 10000) / 10000,
