@@ -82,6 +82,7 @@ async function incrementAICount() {
 }
 
 // Call the API for detection
+// Always use Vercel API for both free and pro users (for stats tracking)
 async function detectAI(text, tweetId) {
   const startTime = performance.now();
   const data = await chrome.storage.local.get(['apiKey']);
@@ -90,48 +91,41 @@ async function detectAI(text, tweetId) {
   log(`Starting API call for tweet ${tweetId}`, { textLength: text.length, hasApiKey });
 
   try {
-    let response;
+    // Always use Vercel API - it handles both authenticated and anonymous requests
+    log(`Fetching ${VERCEL_API_URL}/api/detect...`);
 
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add API key if user has one (for pro features)
     if (hasApiKey) {
-      // Pro user - use Vercel API with authentication
-      log(`Fetching ${VERCEL_API_URL}/api/detect (authenticated)...`);
-      response = await fetch(`${VERCEL_API_URL}/api/detect`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': data.apiKey
-        },
-        body: JSON.stringify({ text, tweetId })
-      });
+      headers['X-API-Key'] = data.apiKey;
+    }
 
-      // Handle auth errors
-      if (response.status === 401) {
-        log('API key invalid or expired');
-        return {
-          success: false,
-          error: 'Invalid API key. Please check your key at kitha.co',
-          authError: true
-        };
-      }
+    const response = await fetch(`${VERCEL_API_URL}/api/detect`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ text, tweetId })
+    });
 
-      if (response.status === 429) {
-        log('Rate limit exceeded on server');
-        return {
-          success: false,
-          error: 'Rate limit exceeded',
-          limitReached: true
-        };
-      }
-    } else {
-      // Free user - use Railway API directly (rate limited locally)
-      log(`Fetching ${RAILWAY_API_URL}/predict (free tier)...`);
-      response = await fetch(`${RAILWAY_API_URL}/predict`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text })
-      });
+    // Handle auth errors (only for users with API key)
+    if (response.status === 401 && hasApiKey) {
+      log('API key invalid or expired');
+      return {
+        success: false,
+        error: 'Invalid API key. Please check your key at kitha.co',
+        authError: true
+      };
+    }
+
+    if (response.status === 429) {
+      log('Rate limit exceeded on server');
+      return {
+        success: false,
+        error: 'Rate limit exceeded',
+        limitReached: true
+      };
     }
 
     const fetchTime = performance.now() - startTime;

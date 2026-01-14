@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 
 // Cache stats for 5 minutes to reduce DB load
 let cachedStats: { totalScans: number; aiDetected: number; humanDetected: number; timestamp: number } | null = null
-const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+const CACHE_TTL = 1 * 60 * 1000 // 1 minute for more real-time updates
 
 export async function GET() {
   try {
