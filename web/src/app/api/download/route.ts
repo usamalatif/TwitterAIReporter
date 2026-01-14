@@ -54,3 +54,44 @@ export async function POST() {
     )
   }
 }
+
+// PUT - Set download count (admin only)
+export async function PUT(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const secret = searchParams.get('secret')
+
+    if (secret !== process.env.SESSION_SECRET) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { downloads } = body
+
+    if (typeof downloads !== 'number' || downloads < 0) {
+      return NextResponse.json({ error: 'Invalid downloads count' }, { status: 400 })
+    }
+
+    const stats = await withRetry(async () => {
+      return await prisma.appStats.upsert({
+        where: { id: 'app-stats' },
+        update: { downloads },
+        create: {
+          id: 'app-stats',
+          downloads,
+        },
+      })
+    })
+
+    return NextResponse.json({
+      success: true,
+      downloads: stats?.downloads || downloads,
+    })
+  } catch (error) {
+    console.error('Error setting download count:', error)
+    return NextResponse.json(
+      { error: 'Failed to set download count' },
+      { status: 500 }
+    )
+  }
+}
