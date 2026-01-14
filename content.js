@@ -164,12 +164,19 @@
       }
     });
 
-    // Find the username container and insert badge AFTER it (not inside)
+    // Find the time element and insert badge after it (inline with name/handle/time)
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
 
     if (usernameContainer) {
-      // Insert after the username container, not inside the link
-      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
+      // Try to find the time element to insert after it
+      const timeElement = usernameContainer.querySelector('time');
+      if (timeElement && timeElement.parentElement) {
+        // Insert after the time's parent (the link containing time)
+        timeElement.parentElement.parentElement.appendChild(badge);
+      } else {
+        // Fallback: append to the username container
+        usernameContainer.appendChild(badge);
+      }
     }
   }
 
@@ -191,7 +198,12 @@
 
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
-      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
+      const timeElement = usernameContainer.querySelector('time');
+      if (timeElement && timeElement.parentElement) {
+        timeElement.parentElement.parentElement.appendChild(badge);
+      } else {
+        usernameContainer.appendChild(badge);
+      }
     }
   }
 
@@ -212,7 +224,12 @@
 
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
-      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
+      const timeElement = usernameContainer.querySelector('time');
+      if (timeElement && timeElement.parentElement) {
+        timeElement.parentElement.parentElement.appendChild(badge);
+      } else {
+        usernameContainer.appendChild(badge);
+      }
       return badge;
     }
     return null;
@@ -236,7 +253,12 @@
 
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
-      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
+      const timeElement = usernameContainer.querySelector('time');
+      if (timeElement && timeElement.parentElement) {
+        timeElement.parentElement.parentElement.appendChild(badge);
+      } else {
+        usernameContainer.appendChild(badge);
+      }
     }
   }
 
