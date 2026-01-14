@@ -337,7 +337,7 @@ function DashboardContent() {
               </p>
               <a
                 href="/kitha-extension-min.zip"
-                download
+                download="Kitha AI Tweet Detector.zip"
                 className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-medium text-white transition hover:from-purple-600 hover:to-pink-600"
               >
                 {Icons.globe("h-4 w-4")} Download ZIP

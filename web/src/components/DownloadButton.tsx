@@ -42,7 +42,7 @@ export default function DownloadButton() {
     // Trigger the actual download
     const link = document.createElement('a')
     link.href = '/kitha-extension-min.zip'
-    link.download = 'kitha-extension.zip'
+    link.download = 'Kitha AI Tweet Detector.zip'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
