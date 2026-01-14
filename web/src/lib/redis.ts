@@ -109,6 +109,41 @@ export async function getUsage(userId: string): Promise<number> {
   }
 }
 
+// Cache API key validation results (avoids slow DB lookups)
+export async function getCachedApiKey(apiKey: string): Promise<{
+  userId: string
+  subscription: string
+  status: string | null
+} | null> {
+  const client = getRedis()
+  if (!client) return null
+
+  try {
+    const cached = await client.get(`apikey:${apiKey}`)
+    if (cached) {
+      return JSON.parse(cached)
+    }
+  } catch (error) {
+    console.error('Redis get apikey error:', error)
+  }
+  return null
+}
+
+export async function cacheApiKey(
+  apiKey: string,
+  data: { userId: string; subscription: string; status: string | null }
+): Promise<void> {
+  const client = getRedis()
+  if (!client) return
+
+  try {
+    // Cache for 1 hour (user can change subscription, so don't cache too long)
+    await client.setex(`apikey:${apiKey}`, 3600, JSON.stringify(data))
+  } catch (error) {
+    console.error('Redis set apikey error:', error)
+  }
+}
+
 // Clean up connection on shutdown
 export async function closeRedis(): Promise<void> {
   if (redis) {
