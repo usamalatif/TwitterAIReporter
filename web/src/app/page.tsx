@@ -1,4 +1,9 @@
-export default function LandingPage() {
+import { cookies } from 'next/headers'
+
+export default async function LandingPage() {
+  const cookieStore = await cookies()
+  const isLoggedIn = !!cookieStore.get('session')?.value
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Navigation */}
@@ -12,10 +17,10 @@ export default function LandingPage() {
             </span>
           </div>
           <a
-            href="/login"
+            href={isLoggedIn ? "/dashboard" : "/login"}
             className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20"
           >
-            Sign In
+            {isLoggedIn ? "Dashboard" : "Sign In"}
           </a>
         </div>
       </nav>
@@ -39,10 +44,10 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <a
-              href="/login"
+              href={isLoggedIn ? "/dashboard" : "/login"}
               className="rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
             >
-              Get Started Free
+              {isLoggedIn ? "Go to Dashboard" : "Get Started Free"}
             </a>
             <a
               href="#pricing"
