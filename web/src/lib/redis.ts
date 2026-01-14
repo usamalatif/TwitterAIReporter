@@ -144,6 +144,51 @@ export async function cacheApiKey(
   }
 }
 
+// Global stats tracking (avoids DB connection for stats)
+export async function incrementGlobalStats(isAI: boolean): Promise<void> {
+  const client = getRedis()
+  if (!client) return
+
+  try {
+    // Increment total scans
+    await client.incr('stats:totalScans')
+    // Increment AI detected if applicable
+    if (isAI) {
+      await client.incr('stats:aiDetected')
+    }
+  } catch (error) {
+    console.error('Redis stats increment error:', error)
+  }
+}
+
+export async function getGlobalStats(): Promise<{
+  totalScans: number
+  aiDetected: number
+  humanDetected: number
+}> {
+  const client = getRedis()
+  if (!client) {
+    return { totalScans: 0, aiDetected: 0, humanDetected: 0 }
+  }
+
+  try {
+    const [totalScans, aiDetected] = await Promise.all([
+      client.get('stats:totalScans'),
+      client.get('stats:aiDetected'),
+    ])
+    const total = parseInt(totalScans || '0', 10)
+    const ai = parseInt(aiDetected || '0', 10)
+    return {
+      totalScans: total,
+      aiDetected: ai,
+      humanDetected: total - ai,
+    }
+  } catch (error) {
+    console.error('Redis stats get error:', error)
+    return { totalScans: 0, aiDetected: 0, humanDetected: 0 }
+  }
+}
+
 // Clean up connection on shutdown
 export async function closeRedis(): Promise<void> {
   if (redis) {

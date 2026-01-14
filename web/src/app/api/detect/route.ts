@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma, withRetry } from '@/lib/db'
-import { getCachedTweet, cacheTweet, getCachedApiKey, cacheApiKey, getUsage, incrementUsage } from '@/lib/redis'
+import { getCachedTweet, cacheTweet, getCachedApiKey, cacheApiKey, getUsage, incrementUsage, incrementGlobalStats } from '@/lib/redis'
 
 const INFERENCE_API_URL = process.env.INFERENCE_API_URL || 'https://twitteraireporter-production.up.railway.app'
 const FREE_LIMIT = 50
@@ -92,9 +92,9 @@ export async function POST(request: NextRequest) {
       // Return cached result if available (for authenticated users)
       if (cached) {
         console.log(`[Detect] Cache HIT for tweet ${tweetId}`)
-        // Track usage in Redis (fast) and DB (background)
+        // Track usage in Redis ONLY (fast, no DB connection needed)
         incrementUsage(userId).catch(console.error)
-        trackUsageInDB(userId, cached.aiProb > 0.5).catch(console.error)
+        // Skip DB tracking to avoid connection pool exhaustion
         console.log(`[Detect] Total time (cached): ${Date.now() - startTime}ms`)
         return NextResponse.json({
           aiProb: cached.aiProb,
@@ -103,17 +103,16 @@ export async function POST(request: NextRequest) {
         }, { headers: corsHeaders })
       }
     } else {
-      // Anonymous user (no API key) - still track for stats
+      // Anonymous user (no API key)
       isAnonymous = true
-      console.log(`[Detect] Anonymous request - will track for stats`)
+      console.log(`[Detect] Anonymous request`)
 
       // Check tweet cache for anonymous users too
       if (tweetId) {
         const cached = await getCachedTweet(tweetId)
         if (cached) {
           console.log(`[Detect] Cache HIT for anonymous tweet ${tweetId}`)
-          // Track anonymous usage
-          trackAnonymousUsageInDB(cached.aiProb > 0.5).catch(console.error)
+          // No DB tracking for anonymous - just return cached result
           return NextResponse.json({
             aiProb: cached.aiProb,
             humanProb: cached.humanProb,
@@ -150,13 +149,14 @@ export async function POST(request: NextRequest) {
       }).catch(console.error)
     }
 
-    // Track usage - either for authenticated user or anonymous
+    // Track usage in Redis only (fast, no DB connection)
+    // DB tracking is disabled to prevent connection pool exhaustion
+    const isAI = result.aiProb > 0.7 // Using new threshold
     if (userId) {
       incrementUsage(userId).catch(console.error)
-      trackUsageInDB(userId, result.aiProb > 0.5).catch(console.error)
-    } else {
-      trackAnonymousUsageInDB(result.aiProb > 0.5).catch(console.error)
     }
+    // Track global stats in Redis for all users (including anonymous)
+    incrementGlobalStats(isAI).catch(console.error)
 
     console.log(`[Detect] Total time (uncached): ${Date.now() - startTime}ms`)
     return NextResponse.json({
