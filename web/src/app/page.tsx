@@ -157,6 +157,71 @@ export default async function LandingPage() {
       {/* Community Stats */}
       <StatsCounter />
 
+      {/* Download & Setup Guide */}
+      <section id="download" className="container mx-auto px-6 py-20">
+        <h2 className="mb-4 text-center text-3xl font-bold text-white md:text-4xl">
+          Get Started in Minutes
+        </h2>
+        <p className="mb-12 text-center text-slate-400">
+          Download the extension and start detecting AI-generated tweets
+        </p>
+
+        {/* Download Button */}
+        <div className="mb-12 text-center">
+          <a
+            href="/kitha-extension.zip"
+            download
+            className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 text-lg font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
+          >
+            {Icons.download("h-6 w-6")} Download Kitha Extension
+          </a>
+          <p className="mt-3 text-sm text-slate-500">Version 2.0.0 • Chrome Browser</p>
+        </div>
+
+        {/* Setup Steps */}
+        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-4">
+          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-sm">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 text-lg font-bold text-white">
+              1
+            </div>
+            <h3 className="mb-2 text-lg font-semibold text-white">Download & Unzip</h3>
+            <p className="text-sm text-slate-400">
+              Click the download button above and extract the ZIP file to a folder on your computer.
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-sm">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 text-lg font-bold text-white">
+              2
+            </div>
+            <h3 className="mb-2 text-lg font-semibold text-white">Open Chrome Extensions</h3>
+            <p className="text-sm text-slate-400">
+              Go to <code className="rounded bg-slate-700 px-1.5 py-0.5 text-purple-400">chrome://extensions</code> in your browser and enable <strong className="text-white">Developer mode</strong> (top right).
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-sm">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 text-lg font-bold text-white">
+              3
+            </div>
+            <h3 className="mb-2 text-lg font-semibold text-white">Load Extension</h3>
+            <p className="text-sm text-slate-400">
+              Click <strong className="text-white">&quot;Load unpacked&quot;</strong> and select the folder where you extracted the extension files.
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-white/5 p-6 backdrop-blur-sm">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 text-lg font-bold text-white">
+              4
+            </div>
+            <h3 className="mb-2 text-lg font-semibold text-white">Add Your API Key</h3>
+            <p className="text-sm text-slate-400">
+              <a href="/login" className="text-purple-400 hover:text-purple-300">Sign up free</a>, copy your API key from the dashboard, and paste it in the extension popup.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="container mx-auto px-6 py-20">
         <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
@@ -169,7 +234,7 @@ export default async function LandingPage() {
             </div>
             <h3 className="mb-2 text-xl font-semibold text-white">1. Install Extension</h3>
             <p className="text-slate-400">
-              Add Kitha to Chrome with one click. No configuration needed.
+              Download and load Kitha in Chrome using Developer mode.
             </p>
           </div>
           <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">

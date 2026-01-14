@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitha - AI Tweet Detector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <svg class="logo-img" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="64" cy="64" r="64" fill="#1E3A8A"/>
+        <rect x="44.8" y="35.2" width="10.24" height="57.6" rx="2" fill="white"/>
+        <path d="M54.4 57.6 L83.2 35.2" stroke="white" stroke-width="10.24" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M57.6 60.8 L83.2 89.6" stroke="white" stroke-width="10.24" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="83.2" cy="64" r="5.12" fill="#F97316"/>
+      </svg>
+      <h1><span class="logo-text">kith</span><span class="logo-accent">a</span></h1>
+      <p class="tagline">AI Detection for Twitter</p>
+    </header>
+
+    <div class="status-card">
+      <div class="status-indicator active" id="statusIndicator"></div>
+      <span class="status-text" id="statusText">Extension Active</span>
+    </div>
+
+    <!-- API Key Section -->
+    <div class="api-section" id="apiSection">
+      <div class="api-status" id="apiStatus">
+        <span class="api-icon" id="apiIcon">🔒</span>
+        <span class="api-text" id="apiText">Free Plan (50 scans/day)</span>
+      </div>
+      <div class="scan-limit" id="scanLimitSection">
+        <div class="limit-bar">
+          <div class="limit-progress" id="limitProgress" style="width: 0%"></div>
+        </div>
+        <span class="limit-text" id="limitText">0 / 50 scans today</span>
+      </div>
+      <button class="api-button" id="apiButton">Enter API Key</button>
+    </div>
+
+    <!-- API Key Input (hidden by default) -->
+    <div class="api-input-section hidden" id="apiInputSection">
+      <input type="text" class="api-input" id="apiKeyInput" placeholder="Enter your API key">
+      <p class="api-error hidden" id="apiError"></p>
+      <div class="api-buttons">
+        <button class="btn btn-primary" id="saveApiKey">Save</button>
+        <button class="btn btn-secondary" id="cancelApiKey">Cancel</button>
+      </div>
+      <p class="api-hint">Get your API key at <a href="https://kitha.co/dashboard" target="_blank">kitha.co</a></p>
+    </div>
+
+    <!-- Remove API Key Confirmation (hidden by default) -->
+    <div class="api-input-section hidden" id="removeConfirmSection">
+      <p class="confirm-text">Remove your API key? You will be limited to 50 scans per day.</p>
+      <div class="api-buttons">
+        <button class="btn btn-danger" id="confirmRemoveKey">Remove</button>
+        <button class="btn btn-secondary" id="cancelRemoveKey">Cancel</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-item">
+        <span class="stat-value" id="tweetsScanned">0</span>
+        <span class="stat-label">Tweets Scanned</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" id="aiDetected">0</span>
+        <span class="stat-label">AI Detected</span>
+      </div>
+    </div>
+
+    <div class="accuracy-card">
+      <span class="accuracy-value">95.6%</span>
+      <span class="accuracy-label">Model Accuracy</span>
+    </div>
+
+    <div class="legend">
+      <h3>Badge Legend</h3>
+      <div class="legend-item">
+        <span class="badge badge-human">✍️ Human</span>
+        <span class="legend-desc">&lt; 30% Vibed</span>
+      </div>
+      <div class="legend-item">
+        <span class="badge badge-uncertain">🤔 Uncertain</span>
+        <span class="legend-desc">30-60% Vibed</span>
+      </div>
+      <div class="legend-item">
+        <span class="badge badge-ai">🤖 Vibed</span>
+        <span class="legend-desc">&gt; 60% AI</span>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p class="version">v2.0.0</p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
