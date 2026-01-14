@@ -1,1 +1,470 @@
-!function(){"use strict";function e(e,t=null){const n=(new Date).toISOString();t?console.log(`[TweetGuard CS ${n}] ${e}`,t):console.log(`[TweetGuard CS ${n}] ${e}`)}const t=new Set;let n=!1;const i={human:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',ai:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>',uncertain:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',lock:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',loading:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',error:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',thumbsUp:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>',thumbsDown:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>'};function o(e){const t=e.querySelector('a[href*="/status/"]');if(t){const e=t.href.match(/\/status\/(\d+)/);return e?e[1]:null}return`tweet-${Date.now()}-${Math.random().toString(36).substr(2,9)}`}function r(e){const t=e.querySelector('[data-testid="tweetText"]');return t?t.innerText.trim():""}async function a(t,n,i,o,r){try{return(await fetch("https://www.kitha.co/api/model-feedback",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tweetId:t,tweetText:n.substring(0,500),aiProb:i,prediction:o,isCorrect:r,timestamp:(new Date).toISOString()})})).ok}catch(t){return e("Failed to send feedback:",t),!1}}function s(e,t){if(e.querySelector(".ai-detector-badge"))return;const n=function(e){const t=Math.round(100*e.aiProb);return e.aiProb<.4?{icon:i.human,text:"Human",className:"ai-badge-human",tooltip:`Human: ${Math.round(100*e.humanProb)}% | AI: ${t}%`,prediction:"human"}:e.aiProb<.7?{icon:i.uncertain,text:`${t}%`,className:"ai-badge-uncertain",tooltip:`Uncertain - Human: ${Math.round(100*e.humanProb)}% | AI: ${t}%`,prediction:"uncertain"}:{icon:i.ai,text:`Vibed ${t}%`,className:"ai-badge-ai",tooltip:`Likely AI-generated (vibed) - Human: ${Math.round(100*e.humanProb)}% | AI: ${t}%`,prediction:"ai"}}(t),s=o(e),c=r(e),d=document.createElement("span");d.className=`ai-detector-badge ${n.className}`,d.title=n.tooltip,d.innerHTML=`\n      <span class="ai-badge-icon">${n.icon}</span>\n      <span class="ai-badge-text">${n.text}</span>\n      <span class="ai-badge-feedback" title="Is this correct?">\n        <button class="ai-feedback-btn ai-feedback-correct" title="Correct">\n          ${i.thumbsUp}\n        </button>\n        <button class="ai-feedback-btn ai-feedback-wrong" title="Wrong">\n          ${i.thumbsDown}\n        </button>\n      </span>\n    `;const l=d.querySelector(".ai-feedback-correct"),u=d.querySelector(".ai-feedback-wrong"),p=d.querySelector(".ai-badge-feedback");d.addEventListener("click",e=>{e.stopPropagation(),e.preventDefault()}),l.addEventListener("click",async e=>{e.stopPropagation(),e.preventDefault();await a(s,c,t.aiProb,n.prediction,!0)&&(p.innerHTML='<span class="ai-feedback-thanks">Thanks!</span>')}),u.addEventListener("click",async e=>{e.stopPropagation(),e.preventDefault();await a(s,c,t.aiProb,n.prediction,!1)&&(p.innerHTML='<span class="ai-feedback-thanks">Thanks!</span>')});const g=e.querySelector('[data-testid="User-Name"]');g&&g.parentNode.insertBefore(d,g.nextSibling)}function c(e){if(e.querySelector(".ai-detector-badge"))return;const t=document.createElement("span");t.className="ai-detector-badge ai-badge-limit",t.title="Daily scan limit reached. Add API key for unlimited scans.",t.innerHTML=`<span class="ai-badge-icon">${i.lock}</span><span class="ai-badge-text">Limit</span>`,t.addEventListener("click",e=>{e.stopPropagation(),e.preventDefault()});const n=e.querySelector('[data-testid="User-Name"]');n&&n.parentNode.insertBefore(t,n.nextSibling)}function d(e){if(e.querySelector(".ai-detector-badge"))return;const t=document.createElement("span");t.className="ai-detector-badge ai-badge-error",t.title="Failed to analyze tweet",t.innerHTML=`<span class="ai-badge-icon">${i.error}</span><span class="ai-badge-text">Error</span>`,t.addEventListener("click",e=>{e.stopPropagation(),e.preventDefault()});const n=e.querySelector('[data-testid="User-Name"]');n&&n.parentNode.insertBefore(t,n.nextSibling)}async function l(a){const l=performance.now(),u=o(a);if(!u||t.has(u))return;const p=r(a);if(!p||p.length<20)return void e(`Skipping tweet ${u} - text too short (${p?.length||0} chars)`);if(e(`Processing tweet ${u}`,{textLength:p.length,textPreview:p.substring(0,50)+"..."}),t.add(u),n)return void c(a);const g=function(e){if(e.querySelector(".ai-detector-badge"))return null;const t=document.createElement("span");t.className="ai-detector-badge ai-badge-loading",t.innerHTML=`<span class="ai-badge-icon ai-badge-spin">${i.loading}</span><span class="ai-badge-text">...</span>`,t.addEventListener("click",e=>{e.stopPropagation(),e.preventDefault()});const n=e.querySelector('[data-testid="User-Name"]');return n?(n.parentNode.insertBefore(t,n.nextSibling),t):null}(a);try{e(`Sending message to background for tweet ${u}...`);const t=performance.now(),i=await chrome.runtime.sendMessage({type:"DETECT_AI",text:p,tweetId:u});if(e(`Background response received in ${(performance.now()-t).toFixed(0)}ms`,i),g&&g.remove(),i.limitReached)return n=!0,c(a),void function(){if(document.getElementById("tweetguard-limit-notification"))return;const e=document.createElement("div");e.id="tweetguard-limit-notification",e.innerHTML='\n      <div style="\n        position: fixed;\n        bottom: 20px;\n        right: 20px;\n        background: linear-gradient(135deg, #ff9800 0%, #f44336 100%);\n        color: white;\n        padding: 16px 20px;\n        border-radius: 12px;\n        font-family: -apple-system, BlinkMacSystemFont, sans-serif;\n        font-size: 14px;\n        z-index: 10000;\n        box-shadow: 0 4px 20px rgba(0,0,0,0.3);\n        max-width: 300px;\n      ">\n        <div style="font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">\n          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>\n          Daily Scan Limit Reached\n        </div>\n        <div style="font-size: 12px; opacity: 0.9;">\n          You\'ve used all 50 free scans today. Add an API key in the extension popup for unlimited scans.\n        </div>\n        <button id="tweetguard-dismiss" style="\n          margin-top: 12px;\n          padding: 8px 16px;\n          background: rgba(255,255,255,0.2);\n          border: none;\n          border-radius: 6px;\n          color: white;\n          font-size: 12px;\n          cursor: pointer;\n        ">Dismiss</button>\n      </div>\n    ',document.body.appendChild(e),document.getElementById("tweetguard-dismiss").addEventListener("click",()=>{e.remove()}),setTimeout(()=>{e.parentNode&&e.remove()},1e4)}();if(i.success){s(a,i);e(`Tweet ${u} processed successfully in ${(performance.now()-l).toFixed(0)}ms - AI: ${(100*i.aiProb).toFixed(1)}%`)}else d(a),e(`Tweet ${u} failed - no success`)}catch(t){e(`Error processing tweet ${u} after ${(performance.now()-l).toFixed(0)}ms: ${t.message}`),g&&g.remove(),d(a)}}const u=new IntersectionObserver(e=>{e.forEach(e=>{e.isIntersecting&&l(e.target)})},{rootMargin:"200px",threshold:.1});function p(){const t=document.querySelectorAll('[data-testid="tweet"]');let n=0;t.forEach(e=>{e.hasAttribute("data-ai-observed")||(e.setAttribute("data-ai-observed","true"),u.observe(e),n++)}),n>0&&e(`Found ${n} new tweets to observe (total on page: ${t.length})`)}const g=new MutationObserver(e=>{clearTimeout(g.timeout),g.timeout=setTimeout(p,100)});async function h(){const t=performance.now();e("Starting initialization...");try{e("Waiting for Twitter DOM...");const n=performance.now();await new Promise(e=>{if(document.querySelector('[data-testid="tweet"]'))return void e();const t=setInterval(()=>{document.querySelector('[data-testid="tweet"]')&&(clearInterval(t),e())},200);setTimeout(()=>{clearInterval(t),e()},3e4)}),e(`Twitter DOM ready in ${(performance.now()-n).toFixed(0)}ms`),e("Starting to observe tweets..."),p(),g.observe(document.body,{childList:!0,subtree:!0});e(`Initialized successfully in ${(performance.now()-t).toFixed(0)}ms`)}catch(t){e(`Initialization failed: ${t.message}`)}}"loading"===document.readyState?document.addEventListener("DOMContentLoaded",h):h()}();
+// TweetGuard AI Detector - Content Script
+// Detects and labels AI-generated tweets using server API
+
+(function() {
+  'use strict';
+
+  // Logging helper
+  function log(message, data = null) {
+    const timestamp = new Date().toISOString();
+    if (data) {
+      console.log(`[TweetGuard CS ${timestamp}] ${message}`, data);
+    } else {
+      console.log(`[TweetGuard CS ${timestamp}] ${message}`);
+    }
+  }
+
+  // Track processed tweets
+  const processedTweets = new Set();
+  let scanLimitReached = false;
+
+  // SVG Icons (compact size)
+  const ICONS = {
+    human: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    ai: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>`,
+    uncertain: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+    lock: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+    loading: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    error: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    thumbsUp: `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>`,
+    thumbsDown: `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>`
+  };
+
+  // Threshold constants - adjusted for better accuracy
+  const THRESHOLD_HUMAN = 0.4;      // Below this = Human
+  const THRESHOLD_AI = 0.7;         // Above this = AI (Vibed)
+  // Between 0.4-0.7 = Uncertain
+
+  // Determine badge style based on score
+  function getBadgeInfo(result) {
+    const percentage = Math.round(result.aiProb * 100);
+
+    if (result.aiProb < THRESHOLD_HUMAN) {
+      return {
+        icon: ICONS.human,
+        text: 'Human',
+        className: 'ai-badge-human',
+        tooltip: `Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
+        prediction: 'human'
+      };
+    } else if (result.aiProb < THRESHOLD_AI) {
+      return {
+        icon: ICONS.uncertain,
+        text: `${percentage}%`,
+        className: 'ai-badge-uncertain',
+        tooltip: `Uncertain - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
+        prediction: 'uncertain'
+      };
+    } else {
+      return {
+        icon: ICONS.ai,
+        text: `Vibed ${percentage}%`,
+        className: 'ai-badge-ai',
+        tooltip: `Likely AI-generated (vibed) - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
+        prediction: 'ai'
+      };
+    }
+  }
+
+  // Extract tweet ID from a tweet element
+  function getTweetId(tweetElement) {
+    const link = tweetElement.querySelector('a[href*="/status/"]');
+    if (link) {
+      const match = link.href.match(/\/status\/(\d+)/);
+      return match ? match[1] : null;
+    }
+    return `tweet-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  // Extract tweet text
+  function getTweetText(tweetElement) {
+    const textElement = tweetElement.querySelector('[data-testid="tweetText"]');
+    if (textElement) {
+      return textElement.innerText.trim();
+    }
+    return '';
+  }
+
+  // Send feedback to server
+  async function sendFeedback(tweetId, tweetText, aiProb, prediction, isCorrect) {
+    try {
+      const response = await fetch('https://www.kitha.co/api/model-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tweetId,
+          tweetText: tweetText.substring(0, 500), // Limit text length
+          aiProb,
+          prediction,
+          isCorrect,
+          timestamp: new Date().toISOString()
+        })
+      });
+      return response.ok;
+    } catch (error) {
+      log('Failed to send feedback:', error);
+      return false;
+    }
+  }
+
+  // Create and inject the AI detection badge with feedback buttons
+  function addAIBadge(tweetElement, result) {
+    if (tweetElement.querySelector('.ai-detector-badge')) {
+      return;
+    }
+
+    const badgeInfo = getBadgeInfo(result);
+    const tweetId = getTweetId(tweetElement);
+    const tweetText = getTweetText(tweetElement);
+
+    const badge = document.createElement('span');
+    badge.className = `ai-detector-badge ${badgeInfo.className}`;
+    badge.title = badgeInfo.tooltip;
+
+    // Badge content with feedback buttons
+    badge.innerHTML = `
+      <span class="ai-badge-icon">${badgeInfo.icon}</span>
+      <span class="ai-badge-text">${badgeInfo.text}</span>
+      <span class="ai-badge-feedback" title="Is this correct?">
+        <button class="ai-feedback-btn ai-feedback-correct" title="Correct">
+          ${ICONS.thumbsUp}
+        </button>
+        <button class="ai-feedback-btn ai-feedback-wrong" title="Wrong">
+          ${ICONS.thumbsDown}
+        </button>
+      </span>
+    `;
+
+    // Add feedback button handlers
+    const correctBtn = badge.querySelector('.ai-feedback-correct');
+    const wrongBtn = badge.querySelector('.ai-feedback-wrong');
+    const feedbackContainer = badge.querySelector('.ai-badge-feedback');
+
+    // Prevent badge clicks from triggering profile navigation
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    correctBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const success = await sendFeedback(tweetId, tweetText, result.aiProb, badgeInfo.prediction, true);
+      if (success) {
+        feedbackContainer.innerHTML = '<span class="ai-feedback-thanks">Thanks!</span>';
+      }
+    });
+
+    wrongBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const success = await sendFeedback(tweetId, tweetText, result.aiProb, badgeInfo.prediction, false);
+      if (success) {
+        feedbackContainer.innerHTML = '<span class="ai-feedback-thanks">Thanks!</span>';
+      }
+    });
+
+    // Find the username container and insert badge AFTER it (not inside)
+    const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
+
+    if (usernameContainer) {
+      // Insert after the username container, not inside the link
+      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
+    }
+  }
+
+  // Add limit reached badge
+  function addLimitBadge(tweetElement) {
+    if (tweetElement.querySelector('.ai-detector-badge')) {
+      return;
+    }
+
+    const badge = document.createElement('span');
+    badge.className = 'ai-detector-badge ai-badge-limit';
+    badge.title = 'Daily scan limit reached. Add API key for unlimited scans.';
+    badge.innerHTML = `<span class="ai-badge-icon">${ICONS.lock}</span><span class="ai-badge-text">Limit</span>`;
+
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
+    if (usernameContainer) {
+      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
+    }
+  }
+
+  // Add loading badge while detecting
+  function addLoadingBadge(tweetElement) {
+    if (tweetElement.querySelector('.ai-detector-badge')) {
+      return null;
+    }
+
+    const badge = document.createElement('span');
+    badge.className = 'ai-detector-badge ai-badge-loading';
+    badge.innerHTML = `<span class="ai-badge-icon ai-badge-spin">${ICONS.loading}</span><span class="ai-badge-text">...</span>`;
+
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
+    if (usernameContainer) {
+      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
+      return badge;
+    }
+    return null;
+  }
+
+  // Add error badge
+  function addErrorBadge(tweetElement) {
+    if (tweetElement.querySelector('.ai-detector-badge')) {
+      return;
+    }
+
+    const badge = document.createElement('span');
+    badge.className = 'ai-detector-badge ai-badge-error';
+    badge.title = 'Failed to analyze tweet';
+    badge.innerHTML = `<span class="ai-badge-icon">${ICONS.error}</span><span class="ai-badge-text">Error</span>`;
+
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
+    if (usernameContainer) {
+      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
+    }
+  }
+
+  // Process a single tweet element
+  async function processTweet(tweetElement) {
+    const startTime = performance.now();
+    const tweetId = getTweetId(tweetElement);
+
+    if (!tweetId || processedTweets.has(tweetId)) {
+      return;
+    }
+
+    const text = getTweetText(tweetElement);
+
+    // Skip tweets with very short text
+    if (!text || text.length < 20) {
+      log(`Skipping tweet ${tweetId} - text too short (${text?.length || 0} chars)`);
+      return;
+    }
+
+    log(`Processing tweet ${tweetId}`, { textLength: text.length, textPreview: text.substring(0, 50) + '...' });
+    processedTweets.add(tweetId);
+
+    // If limit already reached, show limit badge
+    if (scanLimitReached) {
+      addLimitBadge(tweetElement);
+      return;
+    }
+
+    // Add loading indicator
+    const loadingBadge = addLoadingBadge(tweetElement);
+
+    try {
+      // Send to background script for API call
+      log(`Sending message to background for tweet ${tweetId}...`);
+      const msgStartTime = performance.now();
+
+      const result = await chrome.runtime.sendMessage({
+        type: 'DETECT_AI',
+        text: text,
+        tweetId: tweetId
+      });
+
+      const msgTime = performance.now() - msgStartTime;
+      log(`Background response received in ${msgTime.toFixed(0)}ms`, result);
+
+      // Remove loading badge
+      if (loadingBadge) {
+        loadingBadge.remove();
+      }
+
+      if (result.limitReached) {
+        scanLimitReached = true;
+        addLimitBadge(tweetElement);
+        showLimitNotification();
+        return;
+      }
+
+      if (result.success) {
+        addAIBadge(tweetElement, result);
+        const totalTime = performance.now() - startTime;
+        log(`Tweet ${tweetId} processed successfully in ${totalTime.toFixed(0)}ms - AI: ${(result.aiProb * 100).toFixed(1)}%`);
+      } else {
+        addErrorBadge(tweetElement);
+        log(`Tweet ${tweetId} failed - no success`);
+      }
+
+    } catch (error) {
+      const totalTime = performance.now() - startTime;
+      log(`Error processing tweet ${tweetId} after ${totalTime.toFixed(0)}ms: ${error.message}`);
+      if (loadingBadge) {
+        loadingBadge.remove();
+      }
+      addErrorBadge(tweetElement);
+    }
+  }
+
+  // Show notification when limit is reached
+  function showLimitNotification() {
+    if (document.getElementById('tweetguard-limit-notification')) {
+      return;
+    }
+
+    const notification = document.createElement('div');
+    notification.id = 'tweetguard-limit-notification';
+    notification.innerHTML = `
+      <div style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #ff9800 0%, #f44336 100%);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 14px;
+        z-index: 10000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        max-width: 300px;
+      ">
+        <div style="font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Daily Scan Limit Reached
+        </div>
+        <div style="font-size: 12px; opacity: 0.9;">
+          You've used all 50 free scans today. Add an API key in the extension popup for unlimited scans.
+        </div>
+        <button id="tweetguard-dismiss" style="
+          margin-top: 12px;
+          padding: 8px 16px;
+          background: rgba(255,255,255,0.2);
+          border: none;
+          border-radius: 6px;
+          color: white;
+          font-size: 12px;
+          cursor: pointer;
+        ">Dismiss</button>
+      </div>
+    `;
+    document.body.appendChild(notification);
+
+    document.getElementById('tweetguard-dismiss').addEventListener('click', () => {
+      notification.remove();
+    });
+
+    // Auto-dismiss after 10 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 10000);
+  }
+
+  // Intersection Observer for lazy processing
+  const intersectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          processTweet(entry.target);
+        }
+      });
+    },
+    {
+      rootMargin: '200px',
+      threshold: 0.1
+    }
+  );
+
+  // Find and observe all tweet elements
+  function observeTweets() {
+    const tweets = document.querySelectorAll('[data-testid="tweet"]');
+    let newTweets = 0;
+
+    tweets.forEach((tweet) => {
+      if (!tweet.hasAttribute('data-ai-observed')) {
+        tweet.setAttribute('data-ai-observed', 'true');
+        intersectionObserver.observe(tweet);
+        newTweets++;
+      }
+    });
+
+    if (newTweets > 0) {
+      log(`Found ${newTweets} new tweets to observe (total on page: ${tweets.length})`);
+    }
+  }
+
+  // Mutation Observer for infinite scroll
+  const mutationObserver = new MutationObserver((mutations) => {
+    clearTimeout(mutationObserver.timeout);
+    mutationObserver.timeout = setTimeout(observeTweets, 100);
+  });
+
+  // Wait for Twitter to load
+  function waitForTwitter() {
+    return new Promise((resolve) => {
+      if (document.querySelector('[data-testid="tweet"]')) {
+        resolve();
+        return;
+      }
+
+      const checkInterval = setInterval(() => {
+        if (document.querySelector('[data-testid="tweet"]')) {
+          clearInterval(checkInterval);
+          resolve();
+        }
+      }, 200);
+
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        resolve();
+      }, 30000);
+    });
+  }
+
+  // Initialize the extension
+  async function init() {
+    const initStartTime = performance.now();
+    log('Starting initialization...');
+
+    try {
+      // Wait for Twitter DOM
+      log('Waiting for Twitter DOM...');
+      const waitStart = performance.now();
+      await waitForTwitter();
+      log(`Twitter DOM ready in ${(performance.now() - waitStart).toFixed(0)}ms`);
+
+      // Start observing tweets
+      log('Starting to observe tweets...');
+      observeTweets();
+
+      // Watch for new tweets
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+
+      const totalInitTime = performance.now() - initStartTime;
+      log(`Initialized successfully in ${totalInitTime.toFixed(0)}ms`);
+
+    } catch (error) {
+      log(`Initialization failed: ${error.message}`);
+    }
+  }
+
+  // Start when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
