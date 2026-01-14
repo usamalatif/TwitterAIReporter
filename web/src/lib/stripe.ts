@@ -11,7 +11,7 @@ export const isStripeConfigured = () => !!process.env.STRIPE_SECRET_KEY
 export const PLANS = {
   pro: {
     name: 'Pro',
-    price: 9,
+    price: 5,
     priceId: process.env.STRIPE_PRO_PRICE_ID!,
     features: [
       'Unlimited tweet scans',
