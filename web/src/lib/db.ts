@@ -1,23 +1,20 @@
 import { PrismaClient } from '@prisma/client'
 
 // Singleton pattern for Prisma client
-// In serverless environments, we need to handle connection pooling carefully
+// Critical for serverless: reuse connections across requests
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// Create Prisma client - the DATABASE_URL should have pgbouncer=true for Supabase
+// Create Prisma client with minimal logging in production
+// The DATABASE_URL should have pgbouncer=true and connection_limit=1 for Supabase
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+  // Datasource configuration is handled via DATABASE_URL
 })
 
-// Cache the client to reuse connections within the same serverless instance
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma
-} else {
-  // In production, also cache to avoid creating new connections per request
-  globalForPrisma.prisma = prisma
-}
+// ALWAYS cache the client - critical for serverless to prevent connection exhaustion
+globalForPrisma.prisma = prisma
 
 // Helper function to safely run database operations with retry
 // Uses exponential backoff to avoid hammering the connection pool
