@@ -1,0 +1,36 @@
+Update: The roasting calculator is getting too personal.
+
+Me: *presses minus*
+
+Calculator: "Going negative! Like your bank account."
+
+I regret everything.
+-------------
+How I built an AI tweet detector in 2 days:  
+
+→ Frontend: NextJS
+→ Backend: NodeJs
+→ AI Model: PERSONAL Trained Model 
+→ Auth: magic link (no third-party). 
+
+Total cost: $5  
+
+Building in public = free marketing.  
+
+What should I add next?
+
+-------------
+How I built an AI tweet detector in 2 days:  
+
+→ Frontend: NextJS
+→ Backend: NodeJs
+→ AI Model: PERSONAL Trained Model 
+→ Auth: magic link (no third-party). 
+
+Total cost: $5  
+
+Building in public = free marketing.  
+
+What should I add next?
+-------------
+

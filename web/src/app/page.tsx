@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import StatsCounter from '@/components/StatsCounter'
+import DownloadButton from '@/components/DownloadButton'
 
 // SVG Icon Components
 const Icons = {
@@ -167,15 +168,8 @@ export default async function LandingPage() {
         </p>
 
         {/* Download Button */}
-        <div className="mb-12 text-center">
-          <a
-            href="/kitha-extension-min.zip"
-            download
-            className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 text-lg font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
-          >
-            {Icons.download("h-6 w-6")} Download Kitha Extension
-          </a>
-          <p className="mt-3 text-sm text-slate-500">Version 2.0.0 • Chrome Browser</p>
+        <div className="mb-12">
+          <DownloadButton />
         </div>
 
         {/* Setup Steps */}

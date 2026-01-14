@@ -1,0 +1,19 @@
+That's why I was asking ;)
+-------------
+Random question: do you get paid in crypto? If yes how you secure your wallet transparency, like anyone can see how much money you have? 
+
+Any privacy coin or exchanges?
+-------------
+Startup stories I guess?
+-------------
+Financial category is always high earning rates.
+-------------
+Claude Code is so good in the Terminal / CLI.
+
+But Claude Code on the web is buggy as hell.
+
+I added a SessionStart hook to install dependencies whenever Claude Code starts a new session, but the hook just sometimes runs and sometimes doesn't. 😭
+-------------
+You can use my posts for testing your app, as I never use AI to write any of my posts.
+-------------
+can you finally learn EVERY detection just doesn’t work lmao

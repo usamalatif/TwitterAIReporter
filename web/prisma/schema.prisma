@@ -102,3 +102,22 @@ model Feedback {
   message   String
   createdAt DateTime @default(now())
 }
+
+model ModelFeedback {
+  id          String   @id @default(uuid())
+  tweetId     String
+  tweetText   String
+  aiProb      Float
+  prediction  String   // "human", "uncertain", "ai"
+  isCorrect   Boolean  // true = user confirmed, false = user said wrong
+  createdAt   DateTime @default(now())
+
+  @@index([isCorrect])
+  @@index([prediction])
+}
+
+model AppStats {
+  id        String   @id @default("app-stats")
+  downloads Int      @default(0)
+  updatedAt DateTime @updatedAt
+}

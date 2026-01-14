@@ -151,3 +151,69 @@
   color: #ffb3c6;
   border: 1px solid #cc4477;
 }
+
+/* Feedback buttons */
+.ai-badge-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ai-detector-badge:hover .ai-badge-feedback {
+  opacity: 1;
+}
+
+.ai-feedback-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.ai-feedback-btn:hover {
+  transform: scale(1.15);
+}
+
+.ai-feedback-correct:hover {
+  background: rgba(46, 125, 50, 0.3);
+}
+
+.ai-feedback-wrong:hover {
+  background: rgba(198, 40, 40, 0.3);
+}
+
+.ai-feedback-btn svg {
+  display: block;
+}
+
+.ai-feedback-thanks {
+  font-size: 10px;
+  color: inherit;
+  opacity: 0.8;
+}
+
+/* Dark mode feedback buttons */
+[data-color-scheme="dark"] .ai-feedback-btn,
+.dark .ai-feedback-btn {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-color-scheme="dark"] .ai-feedback-correct:hover,
+.dark .ai-feedback-correct:hover {
+  background: rgba(149, 213, 178, 0.3);
+}
+
+[data-color-scheme="dark"] .ai-feedback-wrong:hover,
+.dark .ai-feedback-wrong:hover {
+  background: rgba(255, 179, 179, 0.3);
+}

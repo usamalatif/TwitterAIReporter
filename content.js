@@ -25,33 +25,43 @@
     uncertain: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
     lock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
     loading: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-    error: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+    error: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    thumbsUp: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>`,
+    thumbsDown: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>`
   };
+
+  // Threshold constants - adjusted for better accuracy
+  const THRESHOLD_HUMAN = 0.4;      // Below this = Human
+  const THRESHOLD_AI = 0.7;         // Above this = AI (Vibed)
+  // Between 0.4-0.7 = Uncertain
 
   // Determine badge style based on score
   function getBadgeInfo(result) {
     const percentage = Math.round(result.aiProb * 100);
 
-    if (result.aiProb < 0.3) {
+    if (result.aiProb < THRESHOLD_HUMAN) {
       return {
         icon: ICONS.human,
         text: 'Human',
         className: 'ai-badge-human',
-        tooltip: `Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`
+        tooltip: `Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
+        prediction: 'human'
       };
-    } else if (result.aiProb < 0.6) {
+    } else if (result.aiProb < THRESHOLD_AI) {
       return {
         icon: ICONS.uncertain,
         text: `${percentage}%`,
         className: 'ai-badge-uncertain',
-        tooltip: `Uncertain - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`
+        tooltip: `Uncertain - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
+        prediction: 'uncertain'
       };
     } else {
       return {
         icon: ICONS.ai,
         text: `Vibed ${percentage}%`,
         className: 'ai-badge-ai',
-        tooltip: `Likely AI-generated (vibed) - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`
+        tooltip: `Likely AI-generated (vibed) - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
+        prediction: 'ai'
       };
     }
   }
@@ -75,18 +85,76 @@
     return '';
   }
 
-  // Create and inject the AI detection badge
+  // Send feedback to server
+  async function sendFeedback(tweetId, tweetText, aiProb, prediction, isCorrect) {
+    try {
+      const response = await fetch('https://www.kitha.co/api/model-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tweetId,
+          tweetText: tweetText.substring(0, 500), // Limit text length
+          aiProb,
+          prediction,
+          isCorrect,
+          timestamp: new Date().toISOString()
+        })
+      });
+      return response.ok;
+    } catch (error) {
+      log('Failed to send feedback:', error);
+      return false;
+    }
+  }
+
+  // Create and inject the AI detection badge with feedback buttons
   function addAIBadge(tweetElement, result) {
     if (tweetElement.querySelector('.ai-detector-badge')) {
       return;
     }
 
     const badgeInfo = getBadgeInfo(result);
+    const tweetId = getTweetId(tweetElement);
+    const tweetText = getTweetText(tweetElement);
 
     const badge = document.createElement('span');
     badge.className = `ai-detector-badge ${badgeInfo.className}`;
     badge.title = badgeInfo.tooltip;
-    badge.innerHTML = `<span class="ai-badge-icon">${badgeInfo.icon}</span><span class="ai-badge-text">${badgeInfo.text}</span>`;
+
+    // Badge content with feedback buttons
+    badge.innerHTML = `
+      <span class="ai-badge-icon">${badgeInfo.icon}</span>
+      <span class="ai-badge-text">${badgeInfo.text}</span>
+      <span class="ai-badge-feedback" title="Is this correct?">
+        <button class="ai-feedback-btn ai-feedback-correct" title="Correct">
+          ${ICONS.thumbsUp}
+        </button>
+        <button class="ai-feedback-btn ai-feedback-wrong" title="Wrong">
+          ${ICONS.thumbsDown}
+        </button>
+      </span>
+    `;
+
+    // Add feedback button handlers
+    const correctBtn = badge.querySelector('.ai-feedback-correct');
+    const wrongBtn = badge.querySelector('.ai-feedback-wrong');
+    const feedbackContainer = badge.querySelector('.ai-badge-feedback');
+
+    correctBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const success = await sendFeedback(tweetId, tweetText, result.aiProb, badgeInfo.prediction, true);
+      if (success) {
+        feedbackContainer.innerHTML = '<span class="ai-feedback-thanks">Thanks!</span>';
+      }
+    });
+
+    wrongBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const success = await sendFeedback(tweetId, tweetText, result.aiProb, badgeInfo.prediction, false);
+      if (success) {
+        feedbackContainer.innerHTML = '<span class="ai-feedback-thanks">Thanks!</span>';
+      }
+    });
 
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
 
