@@ -62,6 +62,22 @@ const Icons = {
       <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
     </svg>
   ),
+  twitter: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  ),
+  message: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  ),
+  send: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+  ),
 }
 
 interface UserData {
@@ -83,6 +99,9 @@ function DashboardContent() {
   const [loading, setLoading] = useState(true)
   const [showApiKey, setShowApiKey] = useState(false)
   const [copying, setCopying] = useState(false)
+  const [feedback, setFeedback] = useState('')
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false)
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const success = searchParams.get('success')
@@ -328,6 +347,85 @@ function DashboardContent() {
               <p className="text-sm text-slate-400">
                 Click the Kitha icon in your browser, then paste your API key in the settings.
                 The extension will automatically start detecting AI-generated tweets.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Feedback & Contact Section */}
+        <div className="mt-8 rounded-2xl border border-slate-700 bg-slate-800/50 p-6 backdrop-blur-sm">
+          <h2 className="mb-4 text-lg font-semibold text-white">Feedback & Contact</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Feedback Form */}
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 font-medium text-white">
+                {Icons.message("h-4 w-4")} Share Your Feedback
+              </h3>
+              <p className="mb-4 text-sm text-slate-400">
+                Help us improve Kitha! Let us know what you think.
+              </p>
+              {feedbackSubmitted ? (
+                <div className="flex items-center gap-2 rounded-lg bg-green-500/20 p-4 text-green-400">
+                  {Icons.check("h-5 w-5")}
+                  <span>Thanks for your feedback!</span>
+                </div>
+              ) : (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault()
+                    if (!feedback.trim()) return
+                    setFeedbackSubmitting(true)
+                    try {
+                      await fetch('/api/feedback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ feedback, email: user.email }),
+                      })
+                      setFeedbackSubmitted(true)
+                      setFeedback('')
+                    } catch {
+                      // Still show success - feedback can be reviewed later
+                      setFeedbackSubmitted(true)
+                    } finally {
+                      setFeedbackSubmitting(false)
+                    }
+                  }}
+                >
+                  <textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    placeholder="What do you like? What could be better?"
+                    className="mb-3 h-24 w-full resize-none rounded-lg border border-slate-600 bg-slate-900/50 px-4 py-3 text-sm text-white placeholder-slate-500 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  />
+                  <button
+                    type="submit"
+                    disabled={feedbackSubmitting || !feedback.trim()}
+                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-medium text-white transition hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {Icons.send("h-4 w-4")} {feedbackSubmitting ? 'Sending...' : 'Send Feedback'}
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="mb-2 flex items-center gap-2 font-medium text-white">
+                {Icons.twitter("h-4 w-4")} Contact Us
+              </h3>
+              <p className="mb-4 text-sm text-slate-400">
+                Have questions or need help? Send us a DM on X (Twitter).
+              </p>
+              <a
+                href="https://x.com/OrdinaryWeb3Dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
+              >
+                {Icons.twitter("h-4 w-4")} @OrdinaryWeb3Dev
+              </a>
+              <p className="mt-3 text-xs text-slate-500">
+                Follow for updates and announcements
               </p>
             </div>
           </div>

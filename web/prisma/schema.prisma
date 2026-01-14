@@ -95,3 +95,10 @@ model PromotionClaim {
 
   promotion   Promotion @relation(fields: [promotionId], references: [id])
 }
+
+model Feedback {
+  id        String   @id @default(uuid())
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
