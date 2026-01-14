@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma, withRetry } from '@/lib/db'
 
 // GET - Get download count
 export async function GET() {
   try {
-    const stats = await prisma.appStats.findUnique({
-      where: { id: 'app-stats' },
+    const stats = await withRetry(async () => {
+      return await prisma.appStats.findUnique({
+        where: { id: 'app-stats' },
+      })
     })
 
     return NextResponse.json({
@@ -20,16 +22,25 @@ export async function GET() {
 // POST - Increment download count
 export async function POST() {
   try {
-    const stats = await prisma.appStats.upsert({
-      where: { id: 'app-stats' },
-      update: {
-        downloads: { increment: 1 },
-      },
-      create: {
-        id: 'app-stats',
-        downloads: 1,
-      },
+    const stats = await withRetry(async () => {
+      return await prisma.appStats.upsert({
+        where: { id: 'app-stats' },
+        update: {
+          downloads: { increment: 1 },
+        },
+        create: {
+          id: 'app-stats',
+          downloads: 1,
+        },
+      })
     })
+
+    if (!stats) {
+      return NextResponse.json(
+        { error: 'Failed to track download' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,

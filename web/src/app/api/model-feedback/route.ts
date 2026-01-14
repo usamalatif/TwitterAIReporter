@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma, withRetry } from '@/lib/db'
 
 // CORS headers for extension
 const corsHeaders = {
@@ -33,15 +33,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Store feedback
-    await prisma.modelFeedback.create({
-      data: {
-        tweetId: String(tweetId),
-        tweetText: String(tweetText).substring(0, 1000), // Limit text length
-        aiProb: Number(aiProb),
-        prediction: String(prediction),
-        isCorrect: Boolean(isCorrect),
-      },
+    // Store feedback with retry for connection issues
+    await withRetry(async () => {
+      await prisma.modelFeedback.create({
+        data: {
+          tweetId: String(tweetId),
+          tweetText: String(tweetText).substring(0, 1000), // Limit text length
+          aiProb: Number(aiProb),
+          prediction: String(prediction),
+          isCorrect: Boolean(isCorrect),
+        },
+      })
     })
 
     console.log(`[ModelFeedback] Received: ${prediction} ${isCorrect ? 'correct' : 'wrong'} (aiProb: ${aiProb})`)

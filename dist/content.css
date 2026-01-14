@@ -158,12 +158,6 @@
   align-items: center;
   gap: 2px;
   margin-left: 4px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.ai-detector-badge:hover .ai-badge-feedback {
-  opacity: 1;
 }
 
 .ai-feedback-btn {

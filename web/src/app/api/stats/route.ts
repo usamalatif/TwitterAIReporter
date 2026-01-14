@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma, withRetry } from '@/lib/db'
 
 // Cache stats for 5 minutes to reduce DB load
 let cachedStats: { totalScans: number; aiDetected: number; humanDetected: number; timestamp: number } | null = null
@@ -16,13 +16,31 @@ export async function GET() {
       })
     }
 
-    // Aggregate all usage data
-    const stats = await prisma.usage.aggregate({
-      _sum: {
-        scanCount: true,
-        aiDetected: true,
-      },
+    // Aggregate all usage data with retry for connection issues
+    const stats = await withRetry(async () => {
+      return await prisma.usage.aggregate({
+        _sum: {
+          scanCount: true,
+          aiDetected: true,
+        },
+      })
     })
+
+    // If DB failed after retries, return cached or zeros
+    if (!stats) {
+      if (cachedStats) {
+        return NextResponse.json({
+          totalScans: cachedStats.totalScans,
+          aiDetected: cachedStats.aiDetected,
+          humanDetected: cachedStats.humanDetected,
+        })
+      }
+      return NextResponse.json({
+        totalScans: 0,
+        aiDetected: 0,
+        humanDetected: 0,
+      })
+    }
 
     const totalScans = stats._sum.scanCount || 0
     const aiDetected = stats._sum.aiDetected || 0

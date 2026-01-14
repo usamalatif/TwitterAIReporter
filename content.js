@@ -140,8 +140,15 @@
     const wrongBtn = badge.querySelector('.ai-feedback-wrong');
     const feedbackContainer = badge.querySelector('.ai-badge-feedback');
 
+    // Prevent badge clicks from triggering profile navigation
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
     correctBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
+      e.preventDefault();
       const success = await sendFeedback(tweetId, tweetText, result.aiProb, badgeInfo.prediction, true);
       if (success) {
         feedbackContainer.innerHTML = '<span class="ai-feedback-thanks">Thanks!</span>';
@@ -150,17 +157,19 @@
 
     wrongBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
+      e.preventDefault();
       const success = await sendFeedback(tweetId, tweetText, result.aiProb, badgeInfo.prediction, false);
       if (success) {
         feedbackContainer.innerHTML = '<span class="ai-feedback-thanks">Thanks!</span>';
       }
     });
 
+    // Find the username container and insert badge AFTER it (not inside)
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
 
     if (usernameContainer) {
-      const innerContainer = usernameContainer.querySelector('div[dir="ltr"]') || usernameContainer;
-      innerContainer.appendChild(badge);
+      // Insert after the username container, not inside the link
+      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
     }
   }
 
@@ -175,10 +184,14 @@
     badge.title = 'Daily scan limit reached. Add API key for unlimited scans.';
     badge.innerHTML = `<span class="ai-badge-icon">${ICONS.lock}</span><span class="ai-badge-text">Limit</span>`;
 
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
-      const innerContainer = usernameContainer.querySelector('div[dir="ltr"]') || usernameContainer;
-      innerContainer.appendChild(badge);
+      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
     }
   }
 
@@ -192,10 +205,14 @@
     badge.className = 'ai-detector-badge ai-badge-loading';
     badge.innerHTML = `<span class="ai-badge-icon ai-badge-spin">${ICONS.loading}</span><span class="ai-badge-text">...</span>`;
 
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
-      const innerContainer = usernameContainer.querySelector('div[dir="ltr"]') || usernameContainer;
-      innerContainer.appendChild(badge);
+      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
       return badge;
     }
     return null;
@@ -212,10 +229,14 @@
     badge.title = 'Failed to analyze tweet';
     badge.innerHTML = `<span class="ai-badge-icon">${ICONS.error}</span><span class="ai-badge-text">Error</span>`;
 
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
-      const innerContainer = usernameContainer.querySelector('div[dir="ltr"]') || usernameContainer;
-      innerContainer.appendChild(badge);
+      usernameContainer.parentNode.insertBefore(badge, usernameContainer.nextSibling);
     }
   }
 

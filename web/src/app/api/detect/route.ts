@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma, withRetry } from '@/lib/db'
 import { getCachedTweet, cacheTweet, getCachedApiKey, cacheApiKey, getUsage, incrementUsage } from '@/lib/redis'
 
 const INFERENCE_API_URL = process.env.INFERENCE_API_URL || 'https://twitteraireporter-production.up.railway.app'
@@ -172,28 +172,30 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper function to track usage in database (runs in background)
+// Helper function to track usage in database (runs in background with retry)
 async function trackUsageInDB(userId: string, isAI: boolean) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  await prisma.usage.upsert({
-    where: {
-      userId_date: {
+  await withRetry(async () => {
+    await prisma.usage.upsert({
+      where: {
+        userId_date: {
+          userId,
+          date: today,
+        },
+      },
+      update: {
+        scanCount: { increment: 1 },
+        aiDetected: isAI ? { increment: 1 } : undefined,
+      },
+      create: {
         userId,
         date: today,
+        scanCount: 1,
+        aiDetected: isAI ? 1 : 0,
       },
-    },
-    update: {
-      scanCount: { increment: 1 },
-      aiDetected: isAI ? { increment: 1 } : undefined,
-    },
-    create: {
-      userId,
-      date: today,
-      scanCount: 1,
-      aiDetected: isAI ? 1 : 0,
-    },
+    })
   })
 }
 
@@ -205,34 +207,36 @@ async function trackAnonymousUsageInDB(isAI: boolean) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  // Ensure anonymous user exists
-  await prisma.user.upsert({
-    where: { id: ANONYMOUS_USER_ID },
-    update: {},
-    create: {
-      id: ANONYMOUS_USER_ID,
-      email: 'anonymous@kitha.co',
-      apiKey: 'anonymous-no-key',
-      subscription: 'free',
-    },
-  })
+  await withRetry(async () => {
+    // Ensure anonymous user exists
+    await prisma.user.upsert({
+      where: { id: ANONYMOUS_USER_ID },
+      update: {},
+      create: {
+        id: ANONYMOUS_USER_ID,
+        email: 'anonymous@kitha.co',
+        apiKey: 'anonymous-no-key',
+        subscription: 'free',
+      },
+    })
 
-  await prisma.usage.upsert({
-    where: {
-      userId_date: {
+    await prisma.usage.upsert({
+      where: {
+        userId_date: {
+          userId: ANONYMOUS_USER_ID,
+          date: today,
+        },
+      },
+      update: {
+        scanCount: { increment: 1 },
+        aiDetected: isAI ? { increment: 1 } : undefined,
+      },
+      create: {
         userId: ANONYMOUS_USER_ID,
         date: today,
+        scanCount: 1,
+        aiDetected: isAI ? 1 : 0,
       },
-    },
-    update: {
-      scanCount: { increment: 1 },
-      aiDetected: isAI ? { increment: 1 } : undefined,
-    },
-    create: {
-      userId: ANONYMOUS_USER_ID,
-      date: today,
-      scanCount: 1,
-      aiDetected: isAI ? 1 : 0,
-    },
+    })
   })
 }
