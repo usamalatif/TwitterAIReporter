@@ -87,10 +87,10 @@ export default async function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <a
-              href={isLoggedIn ? "/dashboard" : "/login"}
-              className="rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
+              href="#download"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
             >
-              {isLoggedIn ? "Go to Dashboard" : "Get Started Free"}
+              {Icons.download("h-5 w-5")} Download Extension
             </a>
             <a
               href="#pricing"
@@ -169,7 +169,7 @@ export default async function LandingPage() {
         {/* Download Button */}
         <div className="mb-12 text-center">
           <a
-            href="/kitha-extension.zip"
+            href="/kitha-extension-min.zip"
             download
             className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 text-lg font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
           >
