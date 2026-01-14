@@ -20,16 +20,28 @@ export const metadata: Metadata = {
     icon: "/icon.svg",
     apple: "/icon.svg",
   },
+  metadataBase: new URL("https://www.kitha.co"),
   openGraph: {
     title: "Kitha - Detect AI-Generated Tweets Instantly",
-    description: "Kitha uses advanced AI to analyze tweets and show you which ones are likely written by AI.",
+    description: "Detect AI-generated tweets instantly with our Chrome extension. 95.6% accuracy, free to use.",
     type: "website",
     url: "https://www.kitha.co",
+    siteName: "Kitha",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Kitha - AI Tweet Detector",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Kitha - Detect AI-Generated Tweets",
-    description: "Detect AI-generated tweets instantly with our Chrome extension.",
+    description: "Detect AI-generated tweets instantly with our Chrome extension. 95.6% accuracy, free to use.",
+    images: ["/og-image.png"],
+    creator: "@OrdinaryWeb3Dev",
   },
 };
 

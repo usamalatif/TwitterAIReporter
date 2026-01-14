@@ -1,0 +1,37 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="50%" style="stop-color:#581c87"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Logo circle -->
+  <circle cx="200" cy="315" r="80" fill="#1E3A8A"/>
+
+  <!-- Lowercase "k" -->
+  <rect x="172" y="260" width="13" height="72" rx="2" fill="white"/>
+  <path d="M184 288 L220 260" stroke="white" stroke-width="13" stroke-linecap="round"/>
+  <path d="M188 293 L220 328" stroke="white" stroke-width="13" stroke-linecap="round"/>
+  <circle cx="220" cy="288" r="6" fill="#F97316"/>
+
+  <!-- Text: kitha -->
+  <text x="320" y="290" font-family="Inter, system-ui, sans-serif" font-size="72" font-weight="800" fill="white">kith</text>
+  <text x="475" y="290" font-family="Inter, system-ui, sans-serif" font-size="72" font-weight="800" fill="#F97316">a</text>
+
+  <!-- Tagline -->
+  <text x="320" y="360" font-family="Inter, system-ui, sans-serif" font-size="32" fill="#94a3b8">Detect AI-Generated Tweets Instantly</text>
+
+  <!-- Features -->
+  <text x="320" y="440" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#cbd5e1">Chrome Extension</text>
+  <text x="540" y="440" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#6b7280">|</text>
+  <text x="570" y="440" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#cbd5e1">95.6% Accuracy</text>
+  <text x="770" y="440" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#6b7280">|</text>
+  <text x="800" y="440" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#cbd5e1">Free to Use</text>
+
+  <!-- URL -->
+  <text x="320" y="520" font-family="Inter, system-ui, sans-serif" font-size="28" fill="#a855f7">kitha.co</text>
+</svg>
