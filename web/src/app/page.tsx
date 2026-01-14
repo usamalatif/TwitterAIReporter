@@ -1,5 +1,47 @@
 import { cookies } from 'next/headers'
 
+// SVG Icon Components
+const Icons = {
+  robot: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="10" rx="2"/>
+      <circle cx="12" cy="5" r="2"/>
+      <path d="M12 7v4"/>
+      <line x1="8" y1="16" x2="8" y2="16"/>
+      <line x1="16" y1="16" x2="16" y2="16"/>
+    </svg>
+  ),
+  human: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+  ),
+  download: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="7 10 12 15 17 10"/>
+      <line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+  ),
+  twitter: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  ),
+  tag: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+      <line x1="7" y1="7" x2="7.01" y2="7"/>
+    </svg>
+  ),
+  check: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  ),
+}
+
 export default async function LandingPage() {
   const cookieStore = await cookies()
   const isLoggedIn = !!cookieStore.get('session')?.value
@@ -78,8 +120,8 @@ export default async function LandingPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-white">Tech Influencer</span>
                     <span className="text-slate-400">@techguru</span>
-                    <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400">
-                      🤖 AI 94%
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400">
+                      {Icons.robot("h-3 w-3")} AI 94%
                     </span>
                   </div>
                   <p className="mt-2 text-slate-300">
@@ -97,8 +139,8 @@ export default async function LandingPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-white">Real Person</span>
                     <span className="text-slate-400">@actualhuman</span>
-                    <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400">
-                      ✍️ Human
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400">
+                      {Icons.human("h-3 w-3")} Human
                     </span>
                   </div>
                   <p className="mt-2 text-slate-300">
@@ -118,8 +160,8 @@ export default async function LandingPage() {
         </h2>
         <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-3">
           <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20 text-3xl">
-              📥
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20">
+              {Icons.download("h-8 w-8 text-purple-400")}
             </div>
             <h3 className="mb-2 text-xl font-semibold text-white">1. Install Extension</h3>
             <p className="text-slate-400">
@@ -127,8 +169,8 @@ export default async function LandingPage() {
             </p>
           </div>
           <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20 text-3xl">
-              🐦
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20">
+              {Icons.twitter("h-8 w-8 text-purple-400")}
             </div>
             <h3 className="mb-2 text-xl font-semibold text-white">2. Browse Twitter</h3>
             <p className="text-slate-400">
@@ -136,8 +178,8 @@ export default async function LandingPage() {
             </p>
           </div>
           <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20 text-3xl">
-              🏷️
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20">
+              {Icons.tag("h-8 w-8 text-purple-400")}
             </div>
             <h3 className="mb-2 text-xl font-semibold text-white">3. See AI Badges</h3>
             <p className="text-slate-400">
@@ -163,13 +205,13 @@ export default async function LandingPage() {
             </div>
             <ul className="mb-8 space-y-3 text-slate-300">
               <li className="flex items-center gap-2">
-                <span className="text-green-400">✓</span> 50 scans per day
+                {Icons.check("h-4 w-4 text-green-400")} 50 scans per day
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-green-400">✓</span> AI detection badges
+                {Icons.check("h-4 w-4 text-green-400")} AI detection badges
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-green-400">✓</span> Basic support
+                {Icons.check("h-4 w-4 text-green-400")} Basic support
               </li>
             </ul>
             <button className="w-full rounded-xl border border-slate-600 py-3 font-semibold text-white transition hover:bg-slate-700">
@@ -190,16 +232,16 @@ export default async function LandingPage() {
             </div>
             <ul className="mb-8 space-y-3 text-slate-300">
               <li className="flex items-center gap-2">
-                <span className="text-purple-400">✓</span> Unlimited scans
+                {Icons.check("h-4 w-4 text-purple-400")} Unlimited scans
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-purple-400">✓</span> AI detection badges
+                {Icons.check("h-4 w-4 text-purple-400")} AI detection badges
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-purple-400">✓</span> Priority support
+                {Icons.check("h-4 w-4 text-purple-400")} Priority support
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-purple-400">✓</span> Early access to new features
+                {Icons.check("h-4 w-4 text-purple-400")} Early access to new features
               </li>
             </ul>
             <button className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-3 font-semibold text-white transition hover:from-purple-600 hover:to-pink-600">

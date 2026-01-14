@@ -3,6 +3,58 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+// SVG Icon Components
+const Icons = {
+  star: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+  ),
+  eye: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  ),
+  eyeOff: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  ),
+  copy: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </svg>
+  ),
+  check: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  ),
+  globe: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+  ),
+  party: (className: string) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5.8 11.3 2 22l10.7-3.79"/>
+      <path d="M4 3h.01"/>
+      <path d="M22 8h.01"/>
+      <path d="M15 2h.01"/>
+      <path d="M22 20h.01"/>
+      <path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12v0c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/>
+      <path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11v0c-.11.7-.72 1.22-1.43 1.22H17"/>
+      <path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98v0C9.52 4.9 9 5.52 9 6.23V7"/>
+      <path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/>
+    </svg>
+  ),
+}
+
 interface UserData {
   id: string
   email: string
@@ -117,8 +169,8 @@ function DashboardContent() {
       <main className="container mx-auto px-6 py-10">
         {/* Success/Canceled Messages */}
         {success && (
-          <div className="mb-6 rounded-xl bg-green-500/20 p-4 text-green-400">
-            🎉 Welcome to Kitha Pro! Your subscription is now active.
+          <div className="mb-6 flex items-center gap-3 rounded-xl bg-green-500/20 p-4 text-green-400">
+            {Icons.party("h-5 w-5")} Welcome to Kitha Pro! Your subscription is now active.
           </div>
         )}
         {canceled && (
@@ -134,12 +186,12 @@ function DashboardContent() {
           <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-6 backdrop-blur-sm">
             <h2 className="mb-4 text-lg font-semibold text-white">Subscription</h2>
             <div className="mb-4">
-              <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${
                 isPro
                   ? 'bg-purple-500/20 text-purple-400'
                   : 'bg-slate-600/50 text-slate-300'
               }`}>
-                {isPro ? '⭐ Pro' : 'Free'}
+                {isPro && Icons.star("h-4 w-4")} {isPro ? 'Pro' : 'Free'}
               </span>
             </div>
             {isPro ? (
@@ -218,14 +270,14 @@ function DashboardContent() {
                 className="rounded-lg bg-slate-700 p-2 text-slate-300 transition hover:bg-slate-600"
                 title={showApiKey ? 'Hide' : 'Show'}
               >
-                {showApiKey ? '🙈' : '👁️'}
+                {showApiKey ? Icons.eyeOff("h-4 w-4") : Icons.eye("h-4 w-4")}
               </button>
               <button
                 onClick={copyApiKey}
                 className="rounded-lg bg-slate-700 p-2 text-slate-300 transition hover:bg-slate-600"
                 title="Copy"
               >
-                {copying ? '✓' : '📋'}
+                {copying ? Icons.check("h-4 w-4 text-green-400") : Icons.copy("h-4 w-4")}
               </button>
             </div>
             <button
@@ -254,7 +306,7 @@ function DashboardContent() {
                 href="#"
                 className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
               >
-                <span>🌐</span> Chrome Web Store
+                {Icons.globe("h-4 w-4")} Chrome Web Store
               </a>
             </div>
             <div>

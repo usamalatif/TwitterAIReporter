@@ -18,28 +18,38 @@
   const processedTweets = new Set();
   let scanLimitReached = false;
 
+  // SVG Icons
+  const ICONS = {
+    human: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    ai: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>`,
+    uncertain: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+    lock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+    loading: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    error: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+  };
+
   // Determine badge style based on score
   function getBadgeInfo(result) {
     const percentage = Math.round(result.aiProb * 100);
 
     if (result.aiProb < 0.3) {
       return {
-        emoji: '✍️',
+        icon: ICONS.human,
         text: 'Human',
         className: 'ai-badge-human',
         tooltip: `Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`
       };
     } else if (result.aiProb < 0.6) {
       return {
-        emoji: '🤔',
+        icon: ICONS.uncertain,
         text: `${percentage}%`,
         className: 'ai-badge-uncertain',
         tooltip: `Uncertain - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`
       };
     } else {
       return {
-        emoji: '🤖',
-        text: `${percentage}%`,
+        icon: ICONS.ai,
+        text: `AI ${percentage}%`,
         className: 'ai-badge-ai',
         tooltip: `Likely AI - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`
       };
@@ -76,7 +86,7 @@
     const badge = document.createElement('span');
     badge.className = `ai-detector-badge ${badgeInfo.className}`;
     badge.title = badgeInfo.tooltip;
-    badge.innerHTML = `<span class="ai-badge-emoji">${badgeInfo.emoji}</span><span class="ai-badge-text">${badgeInfo.text}</span>`;
+    badge.innerHTML = `<span class="ai-badge-icon">${badgeInfo.icon}</span><span class="ai-badge-text">${badgeInfo.text}</span>`;
 
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
 
@@ -93,9 +103,9 @@
     }
 
     const badge = document.createElement('span');
-    badge.className = 'ai-detector-badge ai-badge-loading';
+    badge.className = 'ai-detector-badge ai-badge-limit';
     badge.title = 'Daily scan limit reached. Add API key for unlimited scans.';
-    badge.innerHTML = '<span class="ai-badge-emoji">🔒</span><span class="ai-badge-text">Limit</span>';
+    badge.innerHTML = `<span class="ai-badge-icon">${ICONS.lock}</span><span class="ai-badge-text">Limit</span>`;
 
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
@@ -112,7 +122,7 @@
 
     const badge = document.createElement('span');
     badge.className = 'ai-detector-badge ai-badge-loading';
-    badge.innerHTML = '<span class="ai-badge-emoji">⏳</span><span class="ai-badge-text">...</span>';
+    badge.innerHTML = `<span class="ai-badge-icon ai-badge-spin">${ICONS.loading}</span><span class="ai-badge-text">...</span>`;
 
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
@@ -130,9 +140,9 @@
     }
 
     const badge = document.createElement('span');
-    badge.className = 'ai-detector-badge ai-badge-loading';
+    badge.className = 'ai-detector-badge ai-badge-error';
     badge.title = 'Failed to analyze tweet';
-    badge.innerHTML = '<span class="ai-badge-emoji">⚠️</span><span class="ai-badge-text">Error</span>';
+    badge.innerHTML = `<span class="ai-badge-icon">${ICONS.error}</span><span class="ai-badge-text">Error</span>`;
 
     const usernameContainer = tweetElement.querySelector('[data-testid="User-Name"]');
     if (usernameContainer) {
@@ -238,8 +248,9 @@
         box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         max-width: 300px;
       ">
-        <div style="font-weight: 600; margin-bottom: 8px;">
-          🔒 Daily Scan Limit Reached
+        <div style="font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Daily Scan Limit Reached
         </div>
         <div style="font-size: 12px; opacity: 0.9;">
           You've used all 50 free scans today. Add an API key in the extension popup for unlimited scans.
