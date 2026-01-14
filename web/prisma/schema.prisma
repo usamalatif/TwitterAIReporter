@@ -72,3 +72,26 @@ model BetaSignup {
 
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
+
+model Promotion {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  description String
+  maxUses     Int
+  usedCount   Int      @default(0)
+  discountPercent Int  @default(100)
+  durationMonths  Int  @default(1)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  claims      PromotionClaim[]
+}
+
+model PromotionClaim {
+  id          String   @id @default(uuid())
+  promotionId String
+  userId      String   @unique
+  claimedAt   DateTime @default(now())
+
+  promotion   Promotion @relation(fields: [promotionId], references: [id])
+}
