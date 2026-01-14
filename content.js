@@ -49,9 +49,9 @@
     } else {
       return {
         icon: ICONS.ai,
-        text: `AI ${percentage}%`,
+        text: `Vibed ${percentage}%`,
         className: 'ai-badge-ai',
-        tooltip: `Likely AI - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`
+        tooltip: `Likely AI-generated (vibed) - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`
       };
     }
   }

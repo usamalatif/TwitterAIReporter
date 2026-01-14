@@ -16,6 +16,8 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+
   try {
     const apiKey = request.headers.get('X-API-Key')
     const body = await request.json()
@@ -36,11 +38,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find user by API key
-    const user = await prisma.user.findUnique({
-      where: { apiKey },
-      include: { subscriptionData: true },
-    })
+    // Run user lookup and cache check in parallel for speed
+    const cacheStart = Date.now()
+    const [user, cached] = await Promise.all([
+      prisma.user.findUnique({
+        where: { apiKey },
+        include: { subscriptionData: true },
+      }),
+      tweetId ? getCachedTweet(tweetId) : Promise.resolve(null),
+    ])
+    console.log(`[Detect] User lookup + cache check: ${Date.now() - cacheStart}ms`)
 
     if (!user) {
       return NextResponse.json(
@@ -57,6 +64,7 @@ export async function POST(request: NextRequest) {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
+      const usageStart = Date.now()
       const todayUsage = await prisma.usage.findUnique({
         where: {
           userId_date: {
@@ -65,6 +73,7 @@ export async function POST(request: NextRequest) {
           },
         },
       })
+      console.log(`[Detect] Usage check: ${Date.now() - usageStart}ms`)
 
       const scanCount = todayUsage?.scanCount || 0
       if (scanCount >= 50) {
@@ -75,22 +84,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Check Redis cache first (if tweetId provided)
-    if (tweetId) {
-      const cached = await getCachedTweet(tweetId)
-      if (cached) {
-        console.log(`Cache hit for tweet ${tweetId}`)
-        // Still track usage even for cached results
-        await trackUsage(user.id, cached.aiProb > 0.5)
-        return NextResponse.json({
-          aiProb: cached.aiProb,
-          humanProb: cached.humanProb,
-          cached: true,
-        }, { headers: corsHeaders })
-      }
+    // Return cached result if available (cache was fetched in parallel above)
+    if (cached) {
+      console.log(`[Detect] Cache HIT for tweet ${tweetId}`)
+      // Track usage in background - don't await
+      trackUsage(user.id, cached.aiProb > 0.5).catch(console.error)
+      console.log(`[Detect] Total time (cached): ${Date.now() - startTime}ms`)
+      return NextResponse.json({
+        aiProb: cached.aiProb,
+        humanProb: cached.humanProb,
+        cached: true,
+      }, { headers: corsHeaders })
     }
 
+    console.log(`[Detect] Cache MISS for tweet ${tweetId}`)
+
     // Call inference API
+    const inferenceStart = Date.now()
     const inferenceResponse = await fetch(`${INFERENCE_API_URL}/predict`, {
       method: 'POST',
       headers: {
@@ -104,19 +114,18 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await inferenceResponse.json()
+    console.log(`[Detect] Inference API: ${Date.now() - inferenceStart}ms`)
 
-    // Cache the result (if tweetId provided)
+    // Cache and track usage in background - don't await
     if (tweetId) {
-      await cacheTweet(tweetId, {
+      cacheTweet(tweetId, {
         aiProb: result.aiProb,
         humanProb: result.humanProb,
-      })
-      console.log(`Cached result for tweet ${tweetId}`)
+      }).catch(console.error)
     }
+    trackUsage(user.id, result.aiProb > 0.5).catch(console.error)
 
-    // Track usage
-    await trackUsage(user.id, result.aiProb > 0.5)
-
+    console.log(`[Detect] Total time (uncached): ${Date.now() - startTime}ms`)
     return NextResponse.json({
       aiProb: result.aiProb,
       humanProb: result.humanProb,

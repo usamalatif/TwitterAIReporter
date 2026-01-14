@@ -121,7 +121,7 @@ export default async function LandingPage() {
                     <span className="font-bold text-white">Tech Influencer</span>
                     <span className="text-slate-400">@techguru</span>
                     <span className="inline-flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400">
-                      {Icons.robot("h-3 w-3")} AI 94%
+                      {Icons.robot("h-3 w-3")} Vibed 94%
                     </span>
                   </div>
                   <p className="mt-2 text-slate-300">
