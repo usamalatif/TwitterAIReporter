@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { getCachedTweet, cacheTweet } from '@/lib/redis'
 
 const INFERENCE_API_URL = process.env.INFERENCE_API_URL || 'https://twitteraireporter-production.up.railway.app'
 
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     const apiKey = request.headers.get('X-API-Key')
     const body = await request.json()
-    const { text } = body
+    const { text, tweetId } = body
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json(
@@ -74,6 +75,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Check Redis cache first (if tweetId provided)
+    if (tweetId) {
+      const cached = await getCachedTweet(tweetId)
+      if (cached) {
+        console.log(`Cache hit for tweet ${tweetId}`)
+        // Still track usage even for cached results
+        await trackUsage(user.id, cached.aiProb > 0.5)
+        return NextResponse.json({
+          aiProb: cached.aiProb,
+          humanProb: cached.humanProb,
+          cached: true,
+        }, { headers: corsHeaders })
+      }
+    }
+
     // Call inference API
     const inferenceResponse = await fetch(`${INFERENCE_API_URL}/predict`, {
       method: 'POST',
@@ -89,28 +105,17 @@ export async function POST(request: NextRequest) {
 
     const result = await inferenceResponse.json()
 
-    // Track usage
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    // Cache the result (if tweetId provided)
+    if (tweetId) {
+      await cacheTweet(tweetId, {
+        aiProb: result.aiProb,
+        humanProb: result.humanProb,
+      })
+      console.log(`Cached result for tweet ${tweetId}`)
+    }
 
-    await prisma.usage.upsert({
-      where: {
-        userId_date: {
-          userId: user.id,
-          date: today,
-        },
-      },
-      update: {
-        scanCount: { increment: 1 },
-        aiDetected: result.aiProb > 0.5 ? { increment: 1 } : undefined,
-      },
-      create: {
-        userId: user.id,
-        date: today,
-        scanCount: 1,
-        aiDetected: result.aiProb > 0.5 ? 1 : 0,
-      },
-    })
+    // Track usage
+    await trackUsage(user.id, result.aiProb > 0.5)
 
     return NextResponse.json({
       aiProb: result.aiProb,
@@ -123,4 +128,29 @@ export async function POST(request: NextRequest) {
       { status: 500, headers: corsHeaders }
     )
   }
+}
+
+// Helper function to track usage in database
+async function trackUsage(userId: string, isAI: boolean) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  await prisma.usage.upsert({
+    where: {
+      userId_date: {
+        userId,
+        date: today,
+      },
+    },
+    update: {
+      scanCount: { increment: 1 },
+      aiDetected: isAI ? { increment: 1 } : undefined,
+    },
+    create: {
+      userId,
+      date: today,
+      scanCount: 1,
+      aiDetected: isAI ? 1 : 0,
+    },
+  })
 }

@@ -2,18 +2,17 @@
 
 const FREE_SCAN_LIMIT = 50;
 
-// Load stats and settings from storage
+// Load stats and settings from background script
+// This ensures daily reset is properly checked
 async function loadData() {
   return new Promise((resolve) => {
-    chrome.storage.local.get([
-      'tweetsScanned',
-      'aiDetected',
-      'apiKey',
-      'dailyScans',
-      'lastScanDate',
-      'userEmail',
-      'userSubscription'
-    ], resolve);
+    // Get settings from background (handles daily reset)
+    chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (settings) => {
+      // Also get user info stored locally
+      chrome.storage.local.get(['userEmail', 'userSubscription'], (userData) => {
+        resolve({ ...settings, ...userData });
+      });
+    });
   });
 }
 
@@ -44,17 +43,9 @@ async function validateApiKeyWithServer(key) {
   });
 }
 
-// Check if it's a new day and reset counter if needed
-function checkDailyReset(data) {
-  const today = new Date().toDateString();
-  if (data.lastScanDate !== today) {
-    // Reset daily counter
-    chrome.storage.local.set({
-      dailyScans: 0,
-      lastScanDate: today
-    });
-    return 0;
-  }
+// Get daily scan count
+// Background script already handles daily reset via GET_SETTINGS
+function getDailyScans(data) {
   return data.dailyScans || 0;
 }
 
@@ -68,8 +59,8 @@ async function updateUI() {
   document.getElementById('aiDetected').textContent =
     (data.aiDetected || 0).toLocaleString();
 
-  // Check daily reset
-  const dailyScans = checkDailyReset(data);
+  // Get daily scan count
+  const dailyScans = getDailyScans(data);
   const hasApiKey = !!data.apiKey;
 
   // Update API status section

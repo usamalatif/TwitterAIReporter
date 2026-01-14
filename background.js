@@ -253,7 +253,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'GET_SETTINGS') {
-    chrome.storage.local.get(['apiKey', 'dailyScans', 'lastScanDate', 'tweetsScanned', 'aiDetected']).then(sendResponse);
+    (async () => {
+      // Ensure daily reset is checked before returning settings
+      await checkDailyReset();
+      const data = await chrome.storage.local.get(['apiKey', 'dailyScans', 'lastScanDate', 'tweetsScanned', 'aiDetected']);
+      sendResponse(data);
+    })();
     return true;
   }
 });
