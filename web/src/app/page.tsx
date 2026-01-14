@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers'
+import StatsCounter from '@/components/StatsCounter'
 
 // SVG Icon Components
 const Icons = {
@@ -152,6 +153,9 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Community Stats */}
+      <StatsCounter />
 
       {/* How It Works */}
       <section className="container mx-auto px-6 py-20">
@@ -310,7 +314,7 @@ export default async function LandingPage() {
             <div className="flex gap-6 text-sm text-slate-400">
               <a href="/privacy" className="transition hover:text-white">Privacy Policy</a>
               <a href="/terms" className="transition hover:text-white">Terms of Service</a>
-              <a href="mailto:support@kitha.co" className="transition hover:text-white">Contact</a>
+              <a href="https://x.com/OrdinaryWeb3Dev" target="_blank" rel="noopener noreferrer" className="transition hover:text-white">Contact</a>
             </div>
             <p className="text-sm text-slate-500">
               © 2025 Kitha. All rights reserved.
