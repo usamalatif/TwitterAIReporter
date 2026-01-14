@@ -203,40 +203,51 @@ async function trackUsageInDB(userId: string, isAI: boolean) {
 // Uses a special "anonymous" user ID for aggregation
 const ANONYMOUS_USER_ID = 'anonymous-stats-tracker'
 
+// Cache to avoid repeated user creation checks
+let anonymousUserEnsured = false
+
 async function trackAnonymousUsageInDB(isAI: boolean) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
   await withRetry(async () => {
-    // Ensure anonymous user exists
-    await prisma.user.upsert({
-      where: { id: ANONYMOUS_USER_ID },
-      update: {},
-      create: {
-        id: ANONYMOUS_USER_ID,
-        email: 'anonymous@kitha.co',
-        apiKey: 'anonymous-no-key',
-        subscription: 'free',
-      },
-    })
+    // Use a transaction to batch operations and reduce connection usage
+    await prisma.$transaction(async (tx) => {
+      // Only check/create anonymous user once per instance
+      if (!anonymousUserEnsured) {
+        await tx.user.upsert({
+          where: { id: ANONYMOUS_USER_ID },
+          update: {},
+          create: {
+            id: ANONYMOUS_USER_ID,
+            email: 'anonymous@kitha.co',
+            apiKey: 'anonymous-no-key',
+            subscription: 'free',
+          },
+        })
+        anonymousUserEnsured = true
+      }
 
-    await prisma.usage.upsert({
-      where: {
-        userId_date: {
+      await tx.usage.upsert({
+        where: {
+          userId_date: {
+            userId: ANONYMOUS_USER_ID,
+            date: today,
+          },
+        },
+        update: {
+          scanCount: { increment: 1 },
+          aiDetected: isAI ? { increment: 1 } : undefined,
+        },
+        create: {
           userId: ANONYMOUS_USER_ID,
           date: today,
+          scanCount: 1,
+          aiDetected: isAI ? 1 : 0,
         },
-      },
-      update: {
-        scanCount: { increment: 1 },
-        aiDetected: isAI ? { increment: 1 } : undefined,
-      },
-      create: {
-        userId: ANONYMOUS_USER_ID,
-        date: today,
-        scanCount: 1,
-        aiDetected: isAI ? 1 : 0,
-      },
+      })
+    }, {
+      timeout: 5000, // 5 second timeout
     })
   })
 }
