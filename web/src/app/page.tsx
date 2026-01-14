@@ -1,39 +1,4 @@
-'use client'
-
-import { useState } from 'react'
-
 export default function LandingPage() {
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [message, setMessage] = useState('')
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setStatus('loading')
-
-    try {
-      const res = await fetch('/api/beta-signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
-
-      const data = await res.json()
-
-      if (res.ok) {
-        setStatus('success')
-        setMessage(data.message)
-        setEmail('')
-      } else {
-        setStatus('error')
-        setMessage(data.error)
-      }
-    } catch {
-      setStatus('error')
-      setMessage('Something went wrong. Please try again.')
-    }
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Navigation */}
@@ -58,11 +23,6 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-20 text-center">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-purple-500/20 px-4 py-2 text-sm text-purple-300">
-            <span className="animate-pulse">🚀</span>
-            <span>Beta launching soon</span>
-          </div>
-
           <h1 className="mb-6 text-5xl font-bold leading-tight text-white md:text-6xl lg:text-7xl">
             Detect AI-Generated
             <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -76,34 +36,21 @@ export default function LandingPage() {
             likely written by AI. Stay informed about what you&apos;re reading on Twitter/X.
           </p>
 
-          {/* Email Signup Form */}
-          <form onSubmit={handleSubmit} className="mx-auto flex max-w-md flex-col gap-4 sm:flex-row">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              className="flex-1 rounded-xl bg-white/10 px-6 py-4 text-white placeholder-slate-400 backdrop-blur-sm transition focus:bg-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold text-white transition hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
+          {/* CTA Buttons */}
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <a
+              href="/login"
+              className="rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
             >
-              {status === 'loading' ? 'Joining...' : 'Join Beta'}
-            </button>
-          </form>
-
-          {message && (
-            <p className={`mt-4 text-sm ${status === 'success' ? 'text-green-400' : 'text-red-400'}`}>
-              {message}
-            </p>
-          )}
-
-          <p className="mt-4 text-sm text-slate-400">
-            Join 100+ people waiting for launch. No spam, ever.
-          </p>
+              Get Started Free
+            </a>
+            <a
+              href="#pricing"
+              className="rounded-xl border border-slate-600 px-8 py-4 font-semibold text-white transition hover:bg-slate-700"
+            >
+              View Pricing
+            </a>
+          </div>
         </div>
       </section>
 
@@ -196,7 +143,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section className="container mx-auto px-6 py-20">
+      <section id="pricing" className="container mx-auto px-6 py-20">
         <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
           Simple Pricing
         </h2>

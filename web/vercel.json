@@ -1,0 +1,14 @@
+{
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/api/webhook/stripe",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
+  ]
+}

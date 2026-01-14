@@ -163,7 +163,7 @@ function DashboardContent() {
                   onClick={() => handleAction('create-checkout')}
                   className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-2 text-sm font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
                 >
-                  Upgrade to Pro - $9/month
+                  Upgrade to Pro - $5/month
                 </button>
               </>
             )}
