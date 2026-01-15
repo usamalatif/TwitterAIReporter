@@ -30,38 +30,56 @@
     thumbsDown: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>`
   };
 
-  // Threshold constants - adjusted for better accuracy
-  const THRESHOLD_HUMAN = 0.4;      // Below this = Human
-  const THRESHOLD_AI = 0.7;         // Above this = AI (Vibed)
-  // Between 0.4-0.7 = Uncertain
+  // Threshold constants
+  // ≤50% AI = Human, >90% AI = AI, 50-90% = whichever is higher
+  const THRESHOLD_HUMAN = 0.5;      // At or below this = Human
+  const THRESHOLD_AI = 0.9;         // Above this = AI (Vibed)
+  // Between 0.5-0.9 = whichever probability is higher
 
   // Determine badge style based on score
   function getBadgeInfo(result) {
-    const percentage = Math.round(result.aiProb * 100);
+    const aiPercent = Math.round(result.aiProb * 100);
+    const humanPercent = Math.round(result.humanProb * 100);
 
-    if (result.aiProb < THRESHOLD_HUMAN) {
+    // ≤50% AI = definitely Human
+    if (result.aiProb <= THRESHOLD_HUMAN) {
       return {
         icon: ICONS.human,
         text: 'Human',
         className: 'ai-badge-human',
-        tooltip: `Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
+        tooltip: `Human: ${humanPercent}% | AI: ${aiPercent}%`,
         prediction: 'human'
       };
-    } else if (result.aiProb < THRESHOLD_AI) {
+    }
+
+    // >90% AI = definitely AI
+    if (result.aiProb > THRESHOLD_AI) {
       return {
-        icon: ICONS.uncertain,
-        text: `${percentage}%`,
-        className: 'ai-badge-uncertain',
-        tooltip: `Uncertain - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
-        prediction: 'uncertain'
+        icon: ICONS.ai,
+        text: `Vibed ${aiPercent}%`,
+        className: 'ai-badge-ai',
+        tooltip: `Likely AI-generated (vibed) - Human: ${humanPercent}% | AI: ${aiPercent}%`,
+        prediction: 'ai'
+      };
+    }
+
+    // 50-90% range: whichever is higher wins
+    // e.g., 51% human / 49% AI = Human, 51% AI / 49% human = AI
+    if (result.humanProb >= result.aiProb) {
+      return {
+        icon: ICONS.human,
+        text: `Human ${humanPercent}%`,
+        className: 'ai-badge-human',
+        tooltip: `Leaning Human - Human: ${humanPercent}% | AI: ${aiPercent}%`,
+        prediction: 'human'
       };
     } else {
       return {
-        icon: ICONS.ai,
-        text: `Vibed ${percentage}%`,
-        className: 'ai-badge-ai',
-        tooltip: `Likely AI-generated (vibed) - Human: ${Math.round(result.humanProb * 100)}% | AI: ${percentage}%`,
-        prediction: 'ai'
+        icon: ICONS.uncertain,
+        text: `Maybe AI ${aiPercent}%`,
+        className: 'ai-badge-uncertain',
+        tooltip: `Possibly AI - Human: ${humanPercent}% | AI: ${aiPercent}%`,
+        prediction: 'uncertain'
       };
     }
   }

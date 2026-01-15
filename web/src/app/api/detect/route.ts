@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma, withRetry } from '@/lib/db'
 import { getCachedTweet, cacheTweet, getCachedApiKey, cacheApiKey, getUsage, incrementUsage, incrementGlobalStats } from '@/lib/redis'
 
-const INFERENCE_API_URL = process.env.INFERENCE_API_URL || 'https://twitteraireporter-production-1dad.up.railway.app'
+const INFERENCE_API_URL = process.env.INFERENCE_API_URL || 'https://twitteraireporter-production.up.railway.app'
 const FREE_LIMIT = 50
 
 // CORS headers for extension
@@ -138,30 +138,36 @@ export async function POST(request: NextRequest) {
       throw new Error('Inference API error')
     }
 
-    const result = await inferenceResponse.json()
+    const rawResult = await inferenceResponse.json()
     console.log(`[Detect] Inference API: ${Date.now() - inferenceStart}ms`)
 
-    // Cache tweet result
+    // Node.js model has inverted labels - flip them
+    // Raw: high aiProb = human, low aiProb = AI
+    // Corrected: high aiProb = AI, low aiProb = human
+    const correctedAiProb = rawResult.humanProb
+    const correctedHumanProb = rawResult.aiProb
+
+    // Cache tweet result (with corrected values)
     if (tweetId) {
       cacheTweet(tweetId, {
-        aiProb: result.aiProb,
-        humanProb: result.humanProb,
+        aiProb: correctedAiProb,
+        humanProb: correctedHumanProb,
       }).catch(console.error)
     }
 
     // Track usage in Redis only (fast, no DB connection)
-    // DB tracking is disabled to prevent connection pool exhaustion
-    const isAI = result.aiProb > 0.7 // Using new threshold
+    // Threshold logic: >90% = AI, <=50% = Human, 50-90% = whichever is higher
+    const isAI = correctedAiProb > 0.9
     if (userId) {
       incrementUsage(userId).catch(console.error)
     }
     // Track global stats in Redis for all users (including anonymous)
     incrementGlobalStats(isAI).catch(console.error)
 
-    console.log(`[Detect] Total time (uncached): ${Date.now() - startTime}ms`)
+    console.log(`[Detect] Total time (uncached): ${Date.now() - startTime}ms, corrected: AI=${correctedAiProb}, Human=${correctedHumanProb}`)
     return NextResponse.json({
-      aiProb: result.aiProb,
-      humanProb: result.humanProb,
+      aiProb: correctedAiProb,
+      humanProb: correctedHumanProb,
     }, { headers: corsHeaders })
   } catch (error) {
     console.error('Detection error:', error)
