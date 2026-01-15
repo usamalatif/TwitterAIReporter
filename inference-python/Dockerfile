@@ -2,13 +2,22 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install Python dependencies
+# Install git and git-lfs
+RUN apt-get update && apt-get install -y git git-lfs && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies first (for caching)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy model files directly (Railway will pull LFS files if configured)
-# If model files are missing, the server will try to download from HuggingFace
-COPY model/ ./model/
+# Clone repo and fetch LFS files for model
+RUN git lfs install && \
+    git clone --depth 1 https://github.com/usamalatif/TwitterAIReporter.git temp && \
+    cd temp && \
+    git lfs pull --include="inference-python/model/*" && \
+    mv inference-python/model /app/model && \
+    cd .. && rm -rf temp
+
+# Copy server code
 COPY main.py .
 
 # Set environment
