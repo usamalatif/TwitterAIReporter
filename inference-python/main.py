@@ -1,6 +1,7 @@
 """
-Kitha AI Detection Inference Server
+Kitha AI Detection Inference Server v2
 FastAPI server using PyTorch DistilBERT model
+Trained on short-form AI text (99.33% accuracy)
 """
 
 import os
