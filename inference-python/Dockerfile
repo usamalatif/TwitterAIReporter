@@ -2,12 +2,23 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
+# Install git and git-lfs
+RUN apt-get update && apt-get install -y git git-lfs && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies first (for caching)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy model and server
-COPY model/ ./model/
+# Clone repo and fetch LFS files for just the model directory
+RUN git lfs install && \
+    git clone --depth 1 --filter=blob:none --sparse https://github.com/usamalatif/TwitterAIReporter.git temp && \
+    cd temp && \
+    git sparse-checkout set inference-python/model && \
+    git lfs pull && \
+    mv inference-python/model /app/model && \
+    cd .. && rm -rf temp
+
+# Copy server code
 COPY main.py .
 
 # Set environment
