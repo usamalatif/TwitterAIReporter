@@ -32,8 +32,7 @@ npm-debug.log*
 # Vercel
 .vercel
 
-# Large model files (deploy separately)
-*.safetensors
+# Large model files (keep local training data out)
 training/data/
 training/models/
-inference-python/model/
+training/venv/
