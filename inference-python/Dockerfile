@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y git git-lfs && rm -rf /var/lib/apt/list
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Cache buster - update this to force fresh git clone
+ARG CACHEBUST=2
+
 # Clone repo and fetch LFS files for model
 RUN git lfs install && \
     git clone --depth 1 https://github.com/usamalatif/TwitterAIReporter.git temp && \
