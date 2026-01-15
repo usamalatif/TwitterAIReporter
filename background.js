@@ -3,7 +3,10 @@
 
 // API endpoints - use Vercel for authenticated requests, Railway for free tier
 const VERCEL_API_URL = 'https://www.kitha.co'; // Update with your Vercel URL
-const RAILWAY_API_URL = 'https://twitteraireporter-production.up.railway.app';
+const RAILWAY_API_URL = 'https://twitteraireporter-production-1dad.up.railway.app';
+
+// Set to true to test directly with Railway (bypassing Vercel)
+const USE_RAILWAY_DIRECT = false;
 const FREE_SCAN_LIMIT = 50;
 
 // Logging helper
@@ -82,7 +85,7 @@ async function incrementAICount() {
 }
 
 // Call the API for detection
-// Always use Vercel API for both free and pro users (for stats tracking)
+// Use Railway directly for testing, or Vercel for production
 async function detectAI(text, tweetId) {
   const startTime = performance.now();
   const data = await chrome.storage.local.get(['apiKey']);
@@ -91,7 +94,36 @@ async function detectAI(text, tweetId) {
   log(`Starting API call for tweet ${tweetId}`, { textLength: text.length, hasApiKey });
 
   try {
-    // Always use Vercel API - it handles both authenticated and anonymous requests
+    // Use Railway directly for testing (bypasses Vercel/auth)
+    if (USE_RAILWAY_DIRECT) {
+      log(`Fetching ${RAILWAY_API_URL}/predict (direct mode)...`);
+
+      const response = await fetch(`${RAILWAY_API_URL}/predict`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+
+      const fetchTime = performance.now() - startTime;
+      log(`Fetch completed in ${fetchTime.toFixed(0)}ms, status: ${response.status}`);
+
+      if (!response.ok) {
+        throw new Error(`Railway API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const totalTime = performance.now() - startTime;
+      log(`Railway API complete in ${totalTime.toFixed(0)}ms`, result);
+
+      return {
+        success: true,
+        aiProb: result.aiProb,
+        humanProb: result.humanProb,
+        isAI: result.aiProb > 0.5
+      };
+    }
+
+    // Production: Use Vercel API - it handles both authenticated and anonymous requests
     log(`Fetching ${VERCEL_API_URL}/api/detect...`);
 
     const headers = {

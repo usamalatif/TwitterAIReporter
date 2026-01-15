@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma, withRetry } from '@/lib/db'
 import { getCachedTweet, cacheTweet, getCachedApiKey, cacheApiKey, getUsage, incrementUsage, incrementGlobalStats } from '@/lib/redis'
 
-const INFERENCE_API_URL = process.env.INFERENCE_API_URL || 'https://twitteraireporter-production.up.railway.app'
+const INFERENCE_API_URL = process.env.INFERENCE_API_URL || 'https://twitteraireporter-production-1dad.up.railway.app'
 const FREE_LIMIT = 50
 
 // CORS headers for extension
