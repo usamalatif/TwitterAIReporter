@@ -329,31 +329,23 @@ function DashboardContent() {
         {/* Extension Setup */}
         <div className="mt-8 rounded-2xl border border-slate-700 bg-slate-800/50 p-6 backdrop-blur-sm">
           <h2 className="mb-4 text-lg font-semibold text-white">Chrome Extension Setup</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <h3 className="mb-2 font-medium text-white">1. Download Extension</h3>
+              <h3 className="mb-2 font-medium text-white">1. Install Extension</h3>
               <p className="mb-4 text-sm text-slate-400">
-                Download the Kitha extension ZIP file.
+                Add Kitha to Chrome from the Chrome Web Store.
               </p>
               <a
-                href="/kitha-extension-min.zip"
-                download="Kitha AI Tweet Detector.zip"
+                href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-medium text-white transition hover:from-purple-600 hover:to-pink-600"
               >
-                {Icons.globe("h-4 w-4")} Download ZIP
+                {Icons.globe("h-4 w-4")} Add to Chrome
               </a>
             </div>
             <div>
-              <h3 className="mb-2 font-medium text-white">2. Install in Chrome</h3>
-              <p className="text-sm text-slate-400">
-                <span className="block mb-1">1. Unzip the downloaded file</span>
-                <span className="block mb-1">2. Go to <code className="text-purple-400">chrome://extensions</code></span>
-                <span className="block mb-1">3. Enable &quot;Developer mode&quot; (top right)</span>
-                <span className="block">4. Click &quot;Load unpacked&quot; → select folder</span>
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 font-medium text-white">3. Enter Your API Key</h3>
+              <h3 className="mb-2 font-medium text-white">2. Enter Your API Key</h3>
               <p className="text-sm text-slate-400">
                 Click the Kitha icon in your browser, then paste your API key in the settings.
                 The extension will automatically start detecting AI-generated tweets.
