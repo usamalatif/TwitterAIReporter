@@ -1,0 +1,71 @@
+<svg width="1400" height="560" viewBox="0 0 1400 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="50%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="560" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1250" cy="100" r="180" fill="#6366f1" opacity="0.08"/>
+  <circle cx="150" cy="480" r="140" fill="#8b5cf6" opacity="0.08"/>
+  <circle cx="1100" cy="450" r="100" fill="#6366f1" opacity="0.05"/>
+
+  <!-- Logo -->
+  <circle cx="150" cy="280" r="70" fill="url(#accent)"/>
+  <text x="150" y="305" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white" text-anchor="middle">K</text>
+
+  <!-- Main heading -->
+  <text x="260" y="250" font-family="Arial, sans-serif" font-size="64" font-weight="bold" fill="white">Kitha</text>
+  <text x="260" y="310" font-family="Arial, sans-serif" font-size="32" fill="#94a3b8">AI Tweet Detector</text>
+
+  <!-- Tagline -->
+  <text x="260" y="370" font-family="Arial, sans-serif" font-size="22" fill="#64748b">Instantly detect AI-generated content on X/Twitter</text>
+
+  <!-- Feature badges -->
+  <rect x="260" y="410" width="120" height="44" rx="22" fill="#22c55e"/>
+  <text x="320" y="438" font-family="Arial, sans-serif" font-size="16" fill="white" text-anchor="middle">Human</text>
+
+  <rect x="400" y="410" width="130" height="44" rx="22" fill="#eab308"/>
+  <text x="465" y="438" font-family="Arial, sans-serif" font-size="16" fill="white" text-anchor="middle">Maybe AI</text>
+
+  <rect x="550" y="410" width="130" height="44" rx="22" fill="#ef4444"/>
+  <text x="615" y="438" font-family="Arial, sans-serif" font-size="16" fill="white" text-anchor="middle">Vibed 95%</text>
+
+  <!-- Mock Twitter card on right -->
+  <rect x="900" y="80" width="420" height="400" rx="20" fill="#15202b" stroke="#38444d" stroke-width="2"/>
+
+  <!-- Tweet 1 -->
+  <circle cx="950" cy="140" r="28" fill="#1d9bf0"/>
+  <rect x="995" y="125" width="140" height="14" rx="4" fill="#ffffff"/>
+  <rect x="995" y="145" width="90" height="10" rx="3" fill="#64748b"/>
+  <rect x="930" y="180" width="350" height="12" rx="3" fill="#8899a6"/>
+  <rect x="930" y="200" width="300" height="12" rx="3" fill="#8899a6"/>
+  <!-- Human badge -->
+  <rect x="930" y="230" width="85" height="32" rx="16" fill="#22c55e"/>
+  <text x="972" y="251" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle">Human</text>
+
+  <!-- Divider -->
+  <rect x="930" y="280" width="350" height="1" fill="#38444d"/>
+
+  <!-- Tweet 2 -->
+  <circle cx="950" cy="320" r="28" fill="#8b5cf6"/>
+  <rect x="995" y="305" width="120" height="14" rx="4" fill="#ffffff"/>
+  <rect x="995" y="325" width="70" height="10" rx="3" fill="#64748b"/>
+  <rect x="930" y="360" width="340" height="12" rx="3" fill="#8899a6"/>
+  <rect x="930" y="380" width="280" height="12" rx="3" fill="#8899a6"/>
+  <rect x="930" y="400" width="200" height="12" rx="3" fill="#8899a6"/>
+  <!-- AI badge -->
+  <rect x="930" y="430" width="100" height="32" rx="16" fill="#ef4444"/>
+  <text x="980" y="451" font-family="Arial, sans-serif" font-size="13" fill="white" text-anchor="middle">Vibed 94%</text>
+
+  <!-- Bottom tagline -->
+  <text x="700" y="530" font-family="Arial, sans-serif" font-size="18" fill="#64748b" text-anchor="middle">50 Free Scans/Day  •  Real-time Detection  •  No Account Required</text>
+</svg>
