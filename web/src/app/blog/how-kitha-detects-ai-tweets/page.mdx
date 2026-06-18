@@ -1,0 +1,152 @@
+export const metadata = {
+  title: "How Kitha Detects AI Tweets: Methodology & Accuracy",
+  description:
+    "How Kitha's AI tweet detection works, what its 95.6% accuracy figure means, and an honest look at the limits of detecting AI in short text like tweets.",
+  alternates: { canonical: "/blog/how-kitha-detects-ai-tweets" },
+  openGraph: {
+    title: "How Kitha Detects AI Tweets: Methodology & Accuracy",
+    description:
+      "How Kitha's detection works, what 95.6% accuracy means, and the honest limits of AI detection on short text.",
+    type: "article",
+    url: "https://www.kitha.co/blog/how-kitha-detects-ai-tweets",
+    images: ["/og-image.png"],
+  },
+};
+
+# How Kitha Detects AI Tweets: Methodology & Accuracy
+
+> **Quick Answer:** Kitha uses a machine-learning classifier trained on a large corpus of human-written and AI-generated text. For each tweet it analyzes statistical and linguistic patterns — predictability, sentence variation, and phrasing — and outputs an AI-likelihood score. On our internal test dataset it reaches **95.6% accuracy**. That figure is a benchmark, not a guarantee: like every detector, Kitha is less certain on very short posts and should be read as a strong signal, not absolute proof.
+
+We think anyone trusting a detection score deserves to know how the number is produced and where it breaks down. Here's the honest version.
+
+## What the Model Does
+
+Kitha is a **trained classifier**. It learned the difference between human and AI writing from a large set of labeled examples, then applies that learning to new tweets. For each post it weighs signals such as:
+
+- **Predictability (perplexity):** AI models pick high-probability words, so their text is statistically *less surprising* than typical human writing.
+- **Sentence variation (burstiness):** Humans mix short and long sentences; AI tends toward uniform length.
+- **Linguistic patterns:** phrasing, structure, and connective habits that differ between people and language models.
+
+These combine into a single probability that a tweet was AI-generated, which the extension turns into the badge you see in your feed.
+
+## What "95.6% Accuracy" Actually Means
+
+The 95.6% figure is the model's accuracy **on our test dataset** — a held-out set of human and AI examples the model didn't train on. It's a standard way to benchmark a classifier.
+
+What it does **not** mean:
+
+- It is **not** a promise that every individual tweet is judged correctly.
+- It depends on the **mix of data** in the test set; real-world feeds differ.
+- Accuracy is **lower on very short tweets** than on longer posts, because short text carries less signal.
+
+We publish the number because it's a fair benchmark — and we'd rather be upfront about its limits than imply certainty.
+
+## Where Detection Is Hard (Honestly)
+
+Every AI detector, Kitha included, struggles with the same things:
+
+1. **Short text.** A 15-word tweet gives any model far less to work with than an essay. Confidence drops accordingly.
+2. **False positives.** Clear, formal human writing can look "AI." That's why a high score means *look closer*, not *guilty*.
+3. **Paraphrasing and "humanizers."** Tools that rewrite AI text can lower its detectability.
+4. **A moving target.** As models change, detection has to keep adapting — it's an ongoing effort, not a solved problem.
+
+For the practical signs you can check yourself, see [9 signs a tweet was written by AI](/blog/signs-a-tweet-was-written-by-ai).
+
+## How We Handle Your Data
+
+Detection runs without storing your content. Kitha caches only **anonymized result data temporarily (24 hours)** to keep the feed fast — it does **not** store the actual text of tweets or personally identifiable information. Full details are in our [privacy policy](/privacy).
+
+## How to Use Scores Well
+
+- Treat the badge as a **flag**, not a final ruling.
+- Give **short tweets** extra benefit of the doubt.
+- Combine the score with **behavioral signals** for replies (see [how to spot AI bot replies on X](/blog/how-to-spot-ai-bot-replies-on-x)).
+
+## Key Takeaways
+
+- Kitha is a **trained classifier** using predictability, sentence variation, and linguistic patterns.
+- **95.6%** is test-set accuracy — a benchmark, not a per-tweet guarantee.
+- **Short text** is the hardest case for any detector.
+- Kitha stores **no tweet content** — only anonymized results, for 24 hours.
+
+## Frequently Asked Questions
+
+**Q: Is Kitha's 95.6% accuracy guaranteed for every tweet?**
+A: No. It's the model's accuracy on a test dataset. Individual tweets — especially short ones — can be misjudged, so treat the score as a strong signal, not proof.
+
+**Q: Why are short tweets harder to detect?**
+A: Less text means fewer statistical signals. Detection reliability rises with length, so very short posts are the toughest case.
+
+**Q: Can AI text be written to fool Kitha?**
+A: Paraphrasing and "humanizer" tools can lower any detector's confidence. No detector is immune; detection adapts over time.
+
+**Q: Does Kitha store the tweets it analyzes?**
+A: No. It caches only anonymized result data for 24 hours and never stores tweet content or personal information.
+
+## Sources
+
+- [QuillBot — Burstiness & Perplexity Explained](https://quillbot.com/blog/ai-writing-tools/burstiness-and-perplexity/)
+- [Scribbr — Best AI Detectors Tested (2026)](https://www.scribbr.com/ai-tools/best-ai-detector/)
+
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          headline: "How Kitha Detects AI Tweets: Methodology & Accuracy",
+          description:
+            "How Kitha's AI tweet detection works, what its 95.6% accuracy figure means, and the limits of detecting AI in short text.",
+          datePublished: "2026-06-18",
+          dateModified: "2026-06-18",
+          author: { "@type": "Organization", name: "Kitha", url: "https://www.kitha.co" },
+          publisher: {
+            "@type": "Organization",
+            name: "Kitha",
+            logo: { "@type": "ImageObject", url: "https://www.kitha.co/icon.svg" },
+          },
+          mainEntityOfPage: "https://www.kitha.co/blog/how-kitha-detects-ai-tweets",
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "Is Kitha's 95.6% accuracy guaranteed for every tweet?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "No. It's the model's accuracy on a test dataset. Individual tweets, especially short ones, can be misjudged, so treat the score as a strong signal, not proof.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Why are short tweets harder to detect?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Less text means fewer statistical signals. Detection reliability rises with length, so very short posts are the toughest case.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Can AI text be written to fool Kitha?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Paraphrasing and humanizer tools can lower any detector's confidence. No detector is immune; detection adapts over time.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Does Kitha store the tweets it analyzes?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "No. It caches only anonymized result data for 24 hours and never stores tweet content or personal information.",
+              },
+            },
+          ],
+        },
+      ],
+    }),
+  }}
+/>

@@ -229,9 +229,14 @@ export default function LandingPage() {
                 {Icons.check("h-4 w-4 text-green-400")} Basic support
               </li>
             </ul>
-            <button className="w-full rounded-xl border border-slate-600 py-3 font-semibold text-white transition hover:bg-slate-700">
+            <a
+              href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-xl border border-slate-600 py-3 text-center font-semibold text-white transition hover:bg-slate-700"
+            >
               Get Started Free
-            </button>
+            </a>
           </div>
 
           {/* Pro Plan */}
@@ -259,9 +264,14 @@ export default function LandingPage() {
                 {Icons.check("h-4 w-4 text-purple-400")} Early access to new features
               </li>
             </ul>
-            <button className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-3 font-semibold text-white transition hover:from-purple-600 hover:to-pink-600">
+            <a
+              href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-3 text-center font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
+            >
               Upgrade to Pro
-            </button>
+            </a>
           </div>
         </div>
       </section>
