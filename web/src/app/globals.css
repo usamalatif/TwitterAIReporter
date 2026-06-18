@@ -24,3 +24,101 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ---- Blog article prose (scoped, no extra dependencies) ---- */
+.prose-kitha {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: #e2e8f0; /* slate-200 */
+}
+.prose-kitha h1 {
+  font-size: 2.25rem;
+  line-height: 1.15;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 1.25rem;
+  letter-spacing: -0.02em;
+}
+.prose-kitha h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 2.5rem 0 1rem;
+}
+.prose-kitha h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 1.75rem 0 0.75rem;
+}
+.prose-kitha p {
+  margin: 0 0 1.25rem;
+}
+.prose-kitha a {
+  color: #fb923c; /* orange-400 */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-kitha a:hover {
+  color: #f97316;
+}
+.prose-kitha strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+.prose-kitha ul,
+.prose-kitha ol {
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+}
+.prose-kitha ul {
+  list-style: disc;
+}
+.prose-kitha ol {
+  list-style: decimal;
+}
+.prose-kitha li {
+  margin: 0.4rem 0;
+}
+.prose-kitha li::marker {
+  color: #fb923c;
+}
+.prose-kitha blockquote {
+  border-left: 3px solid #f97316;
+  background: rgba(249, 115, 22, 0.08);
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #f1f5f9;
+}
+.prose-kitha blockquote p {
+  margin: 0;
+}
+.prose-kitha table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+.prose-kitha th,
+.prose-kitha td {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+}
+.prose-kitha th {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-weight: 600;
+}
+.prose-kitha code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.3rem;
+  font-size: 0.9em;
+}
+.prose-kitha hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 2.5rem 0;
+}

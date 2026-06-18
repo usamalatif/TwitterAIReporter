@@ -1,5 +1,9 @@
-import { cookies } from 'next/headers'
-import StatsCounter from '@/components/StatsCounter'
+import type { Metadata } from 'next'
+import HomeSchema from '@/components/HomeSchema'
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 // SVG Icon Components
 const Icons = {
@@ -43,12 +47,10 @@ const Icons = {
   ),
 }
 
-export default async function LandingPage() {
-  const cookieStore = await cookies()
-  const isLoggedIn = !!cookieStore.get('session')?.value
-
+export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <HomeSchema />
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-6">
         <div className="flex items-center justify-between">
@@ -59,12 +61,22 @@ export default async function LandingPage() {
               <span className="text-[#F97316]">a</span>
             </span>
           </div>
-          <a
-            href={isLoggedIn ? "/dashboard" : "/login"}
-            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20"
-          >
-            {isLoggedIn ? "Dashboard" : "Sign In"}
-          </a>
+          <div className="flex items-center gap-4">
+            <a
+              href="/blog"
+              className="px-2 py-2 text-sm font-medium text-slate-200 transition hover:text-white"
+            >
+              Blog
+            </a>
+            <a
+              href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20"
+            >
+              Add to Chrome
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -155,9 +167,6 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Community Stats */}
-      <StatsCounter />
 
       {/* How It Works */}
       <section className="container mx-auto px-6 py-20">

@@ -1,8 +1,13 @@
 import type { NextConfig } from "next";
+import createMDX from "@next/mdx";
 
 const nextConfig: NextConfig = {
-  // Prevent trailing slash redirects (important for webhooks)
-  skipTrailingSlashRedirect: true,
+  // Allow .mdx files to be treated as pages/routes
+  pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  // Add markdown plugins here if needed later (remark-gfm, etc.)
+});
+
+export default withMDX(nextConfig);

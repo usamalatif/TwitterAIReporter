@@ -4,32 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
-    "postinstall": "prisma generate",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.36.1",
-    "ioredis": "^5.9.1",
-    "jsonwebtoken": "^9.0.3",
+    "@mdx-js/loader": "^3.1.0",
+    "@mdx-js/react": "^3.1.0",
+    "@next/mdx": "^16.1.1",
     "next": "16.1.1",
-    "prisma": "^5.22.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "resend": "^6.7.0",
-    "stripe": "^20.1.2",
-    "uuid": "^13.0.0"
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mdx": "^2.0.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/uuid": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "sharp": "^0.34.5",

@@ -1,0 +1,199 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "How to Detect If a Tweet or X Post Is AI-Generated (2026)",
+  description:
+    "Learn how to tell if a tweet or X post was written by AI — the telltale signs, manual checks, and the detector tools that flag AI content automatically.",
+  alternates: { canonical: "/blog/how-to-detect-ai-generated-tweets" },
+  openGraph: {
+    title: "How to Detect If a Tweet or X Post Is AI-Generated (2026)",
+    description:
+      "The telltale signs of an AI-written tweet, how detection works, and the fastest way to flag AI posts in your X feed.",
+    type: "article",
+    url: "https://www.kitha.co/blog/how-to-detect-ai-generated-tweets",
+    images: ["/og-image.png"],
+  },
+};
+
+# How to Detect If a Tweet or X Post Is AI-Generated
+
+> **Quick Answer:** You can spot an AI-generated tweet by looking for a cluster of tells — overly polished phrasing, uniform sentence length, generic "engagement-bait" structure, no typos or slang, and suspiciously fast, formal replies. No single sign is proof, but when three or more appear together, the post is very likely AI. For an instant, automated check, an AI tweet detector like [Kitha](/) scores each post as it loads in your X feed.
+
+AI-written posts now make up a large and growing share of what you scroll past on X (formerly Twitter). Some are harmless automation; others are bots manufacturing engagement, pushing narratives, or farming replies. This guide shows you how to tell the difference — first with manual signs you can check yourself, then with tools that do it automatically.
+
+## What Counts as an "AI-Generated" Tweet?
+
+An **AI-generated tweet** is a post whose text was written primarily by a large language model (like ChatGPT, Claude, or Gemini) rather than typed by a person in their own words. This includes fully automated bot accounts, "ghostwriting" tools that draft posts for humans, and reply bots that auto-respond to trending threads.
+
+Detecting them matters because AI text on social media is used for spam, scams, astroturfing, and low-quality engagement farming — and short posts are the *hardest* format to judge by eye.
+
+## 7 Signs a Tweet Was Written by AI
+
+Look for **patterns, not single words.** Human writers occasionally sound polished; AI text tends to stack several of these tells at once.
+
+1. **Uniform cadence.** The biggest 2026 tell is rhythm: sentence after sentence landing at roughly the same length (often 18–24 words), with no short punchy lines. Real people vary wildly — this variation is called *burstiness*, and AI text has very little of it.
+
+2. **Too clean.** No typos, no autocorrect slips, no missing capitals, perfect punctuation — in a casual medium where humans rarely bother. Flawlessness is suspicious.
+
+3. **Generic, "helpful" framing.** Phrases like *"It's important to note,"* *"In today's world,"* *"Here are X key insights,"* or a tidy numbered list crammed into a tweet. LLMs are trained to be even-handed and structured, which reads as bland.
+
+4. **No real voice or specifics.** Vague claims, no personal anecdote, no inside references, no slang, emojis used decoratively rather than expressively. Human posts usually leak personality or context.
+
+5. **Hedged neutrality.** AI avoids hard stances: *"some argue… on the other hand…"* where a person would just have an opinion.
+
+6. **Off-pattern timing and volume.** An account replying within seconds, around the clock, in flawless paragraphs to dozens of threads is almost certainly automated.
+
+7. **Em-dash and connector overuse.** AI historically leaned on em dashes and transition words. This is weaker in 2026 (newer models suppress em dashes unless asked), so treat it as a supporting clue, not a verdict.
+
+> **Rule of thumb:** one tell means nothing. Three or more co-occurring tells in the same short post is a strong AI signal — the signals *multiply*, they don't just add up.
+
+## How the Detection Actually Works (Perplexity & Burstiness)
+
+Automated detectors don't "understand" the tweet — they measure statistical fingerprints:
+
+- **Perplexity** = how predictable the wording is. LLMs pick high-probability next words, so AI text is *less* surprising (lower perplexity) than typical human writing.
+- **Burstiness** = how much sentence length and structure vary. Humans are bursty; AI is uniform.
+
+A detector combines these (plus other features) into a probability score. It's the same logic behind the manual signs above — just measured at scale.
+
+## Manual Check vs. Detector Tools
+
+| Method | Speed | Accuracy on tweets | Best for |
+|--------|-------|-------------------|----------|
+| Eyeballing the signs | Instant | Low–medium (short text is hard) | A quick gut check |
+| Pasting into a web AI detector | Slow (copy/paste each post) | Medium | One-off, careful checks |
+| Browser extension (e.g. Kitha) | Instant, automatic | Medium–high | Checking your whole feed as you scroll |
+
+Manual checks are fine for the occasional "wait, is this real?" moment. But if you want every post in your timeline flagged without copying text anywhere, a dedicated detector is the practical option. [Kitha](/) runs in the background and adds an AI/human badge to each tweet as it loads.
+
+## An Important Caveat: No Detector Is Perfect
+
+Be honest with yourself about the limits. Every independent test of AI detectors finds the same things:
+
+- **Short text is the hardest to score.** A 20-word tweet gives a detector far less signal than a 500-word essay, so confidence is lower.
+- **False positives happen.** Plain, well-structured human writing can read as "AI." Never treat a score as proof — treat it as a flag worth a second look.
+- **Paraphrasing fools detectors.** Lightly edited or "humanized" AI text can slip past.
+
+Use detection to *inform* your judgment, not replace it. A high AI score means "look closer," not "guilty."
+
+## Key Takeaways
+
+- AI tweets reveal themselves through **clusters** of signs — uniform rhythm, over-polish, generic framing, no real voice.
+- The underlying signals are **low perplexity** (predictable wording) and **low burstiness** (uniform sentences).
+- **Short posts are genuinely hard** to judge, so no method is 100% reliable.
+- A **browser extension** is the most practical way to check an entire feed automatically.
+- Treat any AI score as a **flag, not a verdict.**
+
+## Frequently Asked Questions
+
+**Q: Can you really detect AI-generated tweets accurately?**
+A: To a useful degree, yes — but with lower confidence than for long text. Tweets are short, which limits how much signal any detector has. Expect a strong probability estimate, not certainty.
+
+**Q: What's the fastest way to check if a tweet is AI?**
+A: A browser extension that scores posts automatically as you scroll, so you don't have to copy each tweet into a separate tool. [Kitha](/) adds an AI-or-human badge to every tweet in your X feed.
+
+**Q: Do AI detectors give false positives on human tweets?**
+A: Yes. Clear, formal, well-structured human writing sometimes reads as AI. That's why a score should prompt a closer look rather than a final judgment.
+
+**Q: Can AI-generated tweets be made undetectable?**
+A: Paraphrasing and "humanizer" tools can lower detection scores, especially on short text. Detection is an ongoing cat-and-mouse game, not a solved problem.
+
+**Q: Is it against X's rules to use AI to write posts?**
+A: Automation and AI-assisted posting aren't banned outright, but inauthentic behavior, spam, and bot networks violate X's platform rules. Detection helps you decide what to trust, regardless of the rules.
+
+**Q: Does checking a tweet for AI store my data?**
+A: It depends on the tool. Kitha only caches anonymized detection results temporarily (24 hours) and does not store tweet content — check any tool's [privacy policy](/privacy) before using it.
+
+## Sources
+
+- [Pangram Labs — Did AI Write This?](https://www.pangram.com/blog/did-ai-write-this)
+- [QuillBot — Burstiness & Perplexity Explained](https://quillbot.com/blog/ai-writing-tools/burstiness-and-perplexity/)
+- [Scribbr — Best AI Detectors Tested (2026)](https://www.scribbr.com/ai-tools/best-ai-detector/)
+
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          headline:
+            "How to Detect If a Tweet or X Post Is AI-Generated (2026)",
+          description:
+            "Learn how to tell if a tweet or X post was written by AI — the telltale signs, manual checks, and the detector tools that flag AI content automatically.",
+          datePublished: "2026-06-18",
+          dateModified: "2026-06-18",
+          author: {
+            "@type": "Organization",
+            name: "Kitha",
+            url: "https://www.kitha.co",
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "Kitha",
+            logo: {
+              "@type": "ImageObject",
+              url: "https://www.kitha.co/icon.svg",
+            },
+          },
+          mainEntityOfPage:
+            "https://www.kitha.co/blog/how-to-detect-ai-generated-tweets",
+        },
+        {
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "Can you really detect AI-generated tweets accurately?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "To a useful degree, yes, but with lower confidence than for long text. Tweets are short, which limits how much signal any detector has. Expect a strong probability estimate, not certainty.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "What's the fastest way to check if a tweet is AI?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "A browser extension that scores posts automatically as you scroll, so you don't have to copy each tweet into a separate tool. Kitha adds an AI-or-human badge to every tweet in your X feed.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Do AI detectors give false positives on human tweets?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. Clear, formal, well-structured human writing sometimes reads as AI. A score should prompt a closer look rather than a final judgment.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Can AI-generated tweets be made undetectable?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Paraphrasing and humanizer tools can lower detection scores, especially on short text. Detection is an ongoing cat-and-mouse game, not a solved problem.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Is it against X's rules to use AI to write posts?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Automation and AI-assisted posting aren't banned outright, but inauthentic behavior, spam, and bot networks violate X's platform rules.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Does checking a tweet for AI store my data?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "It depends on the tool. Kitha only caches anonymized detection results temporarily (24 hours) and does not store tweet content. Check any tool's privacy policy before using it.",
+              },
+            },
+          ],
+        },
+      ],
+    }),
+  }}
+/>

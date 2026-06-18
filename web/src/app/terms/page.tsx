@@ -1,22 +1,24 @@
+import Link from "next/link";
+
 export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Navigation */}
       <nav className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
-          <a href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <img src="/icon.svg" alt="Kitha" className="h-8 w-8" />
             <span className="text-xl font-extrabold">
               <span className="text-white">kith</span>
               <span className="text-[#F97316]">a</span>
             </span>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/"
             className="rounded-lg bg-slate-700/50 px-4 py-2 text-sm text-slate-300 transition hover:bg-slate-700"
           >
             Back to Home
-          </a>
+          </Link>
         </div>
       </nav>
 
