@@ -21,12 +21,6 @@ export default function BlogLayout({
             <Link href="/blog" className="hover:text-white">
               Blog
             </Link>
-            <a
-              href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
-              className="rounded-lg bg-[#F97316] px-4 py-2 font-semibold text-white hover:bg-orange-600"
-            >
-              Add to Chrome
-            </a>
           </div>
         </div>
       </nav>
@@ -38,18 +32,17 @@ export default function BlogLayout({
         {/* CTA */}
         <div className="mx-auto mt-16 max-w-3xl rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
           <h2 className="text-2xl font-bold text-white">
-            Spot AI tweets automatically
+            Learn to spot AI content
           </h2>
           <p className="mt-2 text-slate-300">
-            Kitha adds an AI-or-human badge to every post in your X feed. Free to
-            use, 95.6% accuracy.
+            Read our guides on detecting AI-generated tweets and bot replies on X.
           </p>
-          <a
-            href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
+          <Link
+            href="/blog"
             className="mt-5 inline-block rounded-lg bg-[#F97316] px-6 py-3 font-semibold text-white hover:bg-orange-600"
           >
-            Add Kitha to Chrome
-          </a>
+            Read more guides
+          </Link>
         </div>
       </main>
 

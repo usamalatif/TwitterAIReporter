@@ -68,14 +68,6 @@ export default function LandingPage() {
             >
               Blog
             </a>
-            <a
-              href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20"
-            >
-              Add to Chrome
-            </a>
           </div>
         </div>
       </nav>
@@ -99,18 +91,16 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <a
-              href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/blog"
               className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
             >
-              {Icons.download("h-5 w-5")} Add to Chrome
+              Read the Blog
             </a>
             <a
-              href="#pricing"
+              href="/blog/how-to-detect-ai-generated-tweets"
               className="rounded-xl border border-slate-600 px-8 py-4 font-semibold text-white transition hover:bg-slate-700"
             >
-              View Pricing
+              How to Detect AI Tweets
             </a>
           </div>
         </div>
@@ -204,77 +194,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="container mx-auto px-6 py-20">
-        <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
-          Simple Pricing
-        </h2>
-        <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
-          {/* Free Plan */}
-          <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-8 backdrop-blur-sm">
-            <h3 className="mb-2 text-2xl font-bold text-white">Free</h3>
-            <p className="mb-6 text-slate-400">Perfect for casual users</p>
-            <div className="mb-6">
-              <span className="text-4xl font-bold text-white">$0</span>
-              <span className="text-slate-400">/month</span>
-            </div>
-            <ul className="mb-8 space-y-3 text-slate-300">
-              <li className="flex items-center gap-2">
-                {Icons.check("h-4 w-4 text-green-400")} 50 scans per day
-              </li>
-              <li className="flex items-center gap-2">
-                {Icons.check("h-4 w-4 text-green-400")} AI detection badges
-              </li>
-              <li className="flex items-center gap-2">
-                {Icons.check("h-4 w-4 text-green-400")} Basic support
-              </li>
-            </ul>
-            <a
-              href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full rounded-xl border border-slate-600 py-3 text-center font-semibold text-white transition hover:bg-slate-700"
-            >
-              Get Started Free
-            </a>
-          </div>
-
-          {/* Pro Plan */}
-          <div className="relative rounded-2xl border-2 border-purple-500 bg-gradient-to-br from-purple-900/50 to-pink-900/50 p-8 backdrop-blur-sm">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-1 text-sm font-medium text-white">
-              Most Popular
-            </div>
-            <h3 className="mb-2 text-2xl font-bold text-white">Pro</h3>
-            <p className="mb-6 text-slate-400">For power users</p>
-            <div className="mb-6">
-              <span className="text-4xl font-bold text-white">$5</span>
-              <span className="text-slate-400">/month</span>
-            </div>
-            <ul className="mb-8 space-y-3 text-slate-300">
-              <li className="flex items-center gap-2">
-                {Icons.check("h-4 w-4 text-purple-400")} Unlimited scans
-              </li>
-              <li className="flex items-center gap-2">
-                {Icons.check("h-4 w-4 text-purple-400")} AI detection badges
-              </li>
-              <li className="flex items-center gap-2">
-                {Icons.check("h-4 w-4 text-purple-400")} Priority support
-              </li>
-              <li className="flex items-center gap-2">
-                {Icons.check("h-4 w-4 text-purple-400")} Early access to new features
-              </li>
-            </ul>
-            <a
-              href="https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-3 text-center font-semibold text-white transition hover:from-purple-600 hover:to-pink-600"
-            >
-              Upgrade to Pro
-            </a>
-          </div>
-        </div>
-      </section>
 
       {/* FAQ */}
       <section className="container mx-auto px-6 py-20">
