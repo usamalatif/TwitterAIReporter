@@ -1,7 +1,7 @@
 // JSON-LD structured data for the homepage.
-// Covers Organization, the SoftwareApplication (the extension), and the
-// homepage FAQ — gives Google + AI assistants a machine-readable description
-// of what Kitha is, so it can be surfaced and cited.
+// Organization + WebSite + FAQPage. Kept in sync with the visible homepage FAQ.
+// (The extension's SoftwareApplication/Offer schema is omitted while the
+// extension is paused — re-add it when the extension relaunches.)
 
 const schema = {
   "@context": "https://schema.org",
@@ -15,43 +15,39 @@ const schema = {
       sameAs: ["https://x.com/OrdinaryWeb3Dev"],
     },
     {
-      "@type": "SoftwareApplication",
-      name: "Kitha — AI Tweet Detector",
-      applicationCategory: "BrowserApplication",
-      operatingSystem: "Chrome",
+      "@type": "WebSite",
+      "@id": "https://www.kitha.co/#website",
+      name: "Kitha",
       url: "https://www.kitha.co",
-      downloadUrl:
-        "https://chromewebstore.google.com/detail/kitha-ai-tweet-detector/idlmbjjhhlhbomgepbbhgmfnllekfhbd",
-      description:
-        "Kitha detects AI-generated tweets instantly with a Chrome extension, adding an AI-or-human badge to each post in your X (Twitter) feed.",
       publisher: { "@id": "https://www.kitha.co/#organization" },
-      offers: [
-        {
-          "@type": "Offer",
-          name: "Free",
-          price: "0",
-          priceCurrency: "USD",
-          description: "50 scans per day, AI detection badges, basic support.",
-        },
-        {
-          "@type": "Offer",
-          name: "Pro",
-          price: "5",
-          priceCurrency: "USD",
-          description:
-            "Unlimited scans, AI detection badges, priority support, early access.",
-        },
-      ],
+      description:
+        "Guides on detecting AI-generated content on Twitter/X — how detection works, the telltale signs, and the best tools.",
     },
     {
       "@type": "FAQPage",
       mainEntity: [
         {
           "@type": "Question",
-          name: "How accurate is the AI detection?",
+          name: "How can I tell if a tweet is AI-generated?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Kitha's model achieves 95.6% accuracy on our test dataset. It's trained on a large corpus of human and AI-generated text to reliably distinguish between the two.",
+            text: "Look for clusters of signs: uniform sentence rhythm, flawless punctuation, generic phrasing, and no personal voice. One sign means little; three or more together is a strong signal the post is AI.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How accurate are AI tweet detectors?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Useful but not perfect. Short text like tweets is the hardest to score, so any result is best read as a strong signal rather than proof.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Is the Kitha browser extension available?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "The extension is temporarily paused while we rebuild it. In the meantime, our guides cover how to spot AI tweets and bot replies yourself.",
           },
         },
         {
@@ -59,23 +55,7 @@ const schema = {
           name: "Does Kitha store my data?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "We only store anonymized tweet IDs for caching purposes (24 hours). We never store the actual tweet content or any personally identifiable information.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Can I use Kitha on mobile?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Currently, Kitha is only available as a Chrome extension for desktop. We're exploring mobile options for the future.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "What happens when I hit the free limit?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "When you reach 50 scans per day, you can upgrade to Pro for unlimited scans, or wait until the next day when your limit resets.",
+            text: "No. Kitha caches only anonymized detection results temporarily (24 hours) and never stores tweet content or personally identifiable information.",
           },
         },
       ],

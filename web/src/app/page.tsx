@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import HomeSchema from '@/components/HomeSchema'
+import { sortedPosts } from '@/lib/posts'
 
 export const metadata: Metadata = {
   alternates: { canonical: '/' },
@@ -83,9 +84,12 @@ export default function LandingPage() {
             Instantly
           </h1>
 
-          <p className="mx-auto mb-10 max-w-2xl text-xl text-slate-300">
-            Kitha uses advanced AI to analyze tweets and show you which ones are
-            likely written by AI. Stay informed about what you&apos;re reading on Twitter/X.
+          <p className="mx-auto mb-6 max-w-2xl text-xl text-slate-300">
+            Kitha helps you understand what&apos;s AI on X. Read our guides on spotting
+            AI-generated tweets and bot replies — and how AI text detection actually works.
+          </p>
+          <p className="mx-auto mb-10 text-sm text-slate-400">
+            Note: the Kitha Chrome extension is temporarily paused while we rebuild it.
           </p>
 
           {/* CTA Buttons */}
@@ -158,42 +162,38 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* Featured Guides */}
       <section className="container mx-auto px-6 py-20">
-        <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
-          How It Works
+        <h2 className="mb-4 text-center text-3xl font-bold text-white md:text-4xl">
+          Guides
         </h2>
-        <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-3">
-          <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20">
-              {Icons.download("h-8 w-8 text-purple-400")}
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white">1. Install Extension</h3>
-            <p className="text-slate-400">
-              Download and load Kitha in Chrome using Developer mode.
-            </p>
-          </div>
-          <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20">
-              {Icons.twitter("h-8 w-8 text-purple-400")}
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white">2. Browse Twitter</h3>
-            <p className="text-slate-400">
-              Use Twitter/X normally. Kitha works silently in the background.
-            </p>
-          </div>
-          <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-sm">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/20">
-              {Icons.tag("h-8 w-8 text-purple-400")}
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white">3. See AI Badges</h3>
-            <p className="text-slate-400">
-              Each tweet gets a badge showing if it&apos;s likely AI-generated or human-written.
-            </p>
-          </div>
+        <p className="mx-auto mb-12 max-w-2xl text-center text-slate-400">
+          Practical, evidence-based guides to spotting AI content on X.
+        </p>
+        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
+          {sortedPosts.map((post) => (
+            <a
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="block rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:border-white/20 hover:bg-white/10"
+            >
+              <h3 className="text-xl font-semibold text-white">{post.title}</h3>
+              <p className="mt-2 text-slate-400">{post.description}</p>
+              <span className="mt-3 inline-block font-semibold text-[#F97316]">
+                Read more →
+              </span>
+            </a>
+          ))}
+        </div>
+        <div className="mt-10 text-center">
+          <a
+            href="/blog"
+            className="inline-block rounded-xl border border-slate-600 px-6 py-3 font-semibold text-white transition hover:bg-slate-700"
+          >
+            View all guides
+          </a>
         </div>
       </section>
-
 
       {/* FAQ */}
       <section className="container mx-auto px-6 py-20">
@@ -203,11 +203,37 @@ export default function LandingPage() {
         <div className="mx-auto max-w-3xl space-y-6">
           <div className="rounded-xl bg-white/5 p-6 backdrop-blur-sm">
             <h3 className="mb-2 text-lg font-semibold text-white">
-              How accurate is the AI detection?
+              How can I tell if a tweet is AI-generated?
             </h3>
             <p className="text-slate-400">
-              Our model achieves 95.6% accuracy on our test dataset. It&apos;s trained on a large corpus
-              of human and AI-generated text to reliably distinguish between the two.
+              Look for clusters of signs — uniform sentence rhythm, flawless punctuation,
+              generic phrasing, and no personal voice. Our{' '}
+              <a href="/blog/how-to-detect-ai-generated-tweets" className="text-[#F97316] hover:underline">
+                detection guide
+              </a>{' '}
+              walks through every signal.
+            </p>
+          </div>
+          <div className="rounded-xl bg-white/5 p-6 backdrop-blur-sm">
+            <h3 className="mb-2 text-lg font-semibold text-white">
+              How accurate are AI tweet detectors?
+            </h3>
+            <p className="text-slate-400">
+              Useful but not perfect. Short text like tweets is the hardest to score, so any
+              result is best read as a strong signal rather than proof. See our{' '}
+              <a href="/blog/how-kitha-detects-ai-tweets" className="text-[#F97316] hover:underline">
+                methodology &amp; accuracy
+              </a>{' '}
+              explainer.
+            </p>
+          </div>
+          <div className="rounded-xl bg-white/5 p-6 backdrop-blur-sm">
+            <h3 className="mb-2 text-lg font-semibold text-white">
+              Is the Kitha browser extension available?
+            </h3>
+            <p className="text-slate-400">
+              The extension is temporarily paused while we rebuild it. In the meantime, our
+              guides cover how to spot AI tweets and bot replies yourself.
             </p>
           </div>
           <div className="rounded-xl bg-white/5 p-6 backdrop-blur-sm">
@@ -215,26 +241,8 @@ export default function LandingPage() {
               Does Kitha store my data?
             </h3>
             <p className="text-slate-400">
-              We only store anonymized tweet IDs for caching purposes (24 hours). We never store
-              the actual tweet content or any personally identifiable information.
-            </p>
-          </div>
-          <div className="rounded-xl bg-white/5 p-6 backdrop-blur-sm">
-            <h3 className="mb-2 text-lg font-semibold text-white">
-              Can I use Kitha on mobile?
-            </h3>
-            <p className="text-slate-400">
-              Currently, Kitha is only available as a Chrome extension for desktop. We&apos;re
-              exploring mobile options for the future.
-            </p>
-          </div>
-          <div className="rounded-xl bg-white/5 p-6 backdrop-blur-sm">
-            <h3 className="mb-2 text-lg font-semibold text-white">
-              What happens when I hit the free limit?
-            </h3>
-            <p className="text-slate-400">
-              When you reach 50 scans per day, you can upgrade to Pro for unlimited scans, or
-              wait until the next day when your limit resets.
+              No. Kitha caches only anonymized detection results temporarily (24 hours) and
+              never stores tweet content or personally identifiable information.
             </p>
           </div>
         </div>
